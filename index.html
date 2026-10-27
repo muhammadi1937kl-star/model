@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Модель счетов — калькулятор</title>
+<style>
+:root{--bg:#f3f7fb;--card:#fff;--tx:#0f2a43;--mut:#5b7189;--pri:#0b5a8f;--acc:#16a37f;--red:#e5383b;--bd:#d6e2ee;--sh:0 6px 20px rgba(11,90,143,.10);
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1722;--card:#12273a;--tx:#e8f1f9;--mut:#9bb2c7;--pri:#4aa3df;--acc:#2fd1a6;--red:#ff6b6b;--bd:#244560;--sh:0 6px 20px rgba(0,0,0,.35)}}
+:root[data-theme="dark"]{--bg:#0b1722;--card:#12273a;--tx:#e8f1f9;--mut:#9bb2c7;--pri:#4aa3df;--acc:#2fd1a6;--red:#ff6b6b;--bd:#244560;--sh:0 6px 20px rgba(0,0,0,.35)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.4}
+.wrap{max-width:980px;margin:0 auto;padding:20px 16px 40px}
+h1{font-size:clamp(24px,5vw,36px);margin:8px 0 4px}
+.sub{color:var(--mut);margin:0 0 20px}
+.inputs{display:grid;grid-template-columns:1fr;gap:12px;background:linear-gradient(135deg,var(--pri),#1a8fd0);padding:18px;border-radius:20px;box-shadow:var(--sh)}
+.inputs label{color:#fff;font-size:14px;display:block;margin-bottom:6px;opacity:.95}
+.inputs input{width:100%;font-size:22px;font-weight:700;padding:12px 14px;border-radius:12px;border:0;color:#0f2a43;background:#fff;outline:none}
+.inputs small{color:#d9ecf9;display:block;margin-top:4px;font-size:12px}
+.lvl{margin-top:22px}
+.lvl h2{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);margin:0 0 10px}
+.row{display:grid;gap:12px}
+.c2{grid-template-columns:repeat(2,1fr)}.c3{grid-template-columns:repeat(3,1fr)}
+.card{background:var(--card);border:1.5px solid var(--bd);border-radius:16px;padding:14px 16px;box-shadow:var(--sh);position:relative;overflow:hidden}
+.card:before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--pri)}
+.card.g:before{background:var(--acc)}.card.r:before{background:var(--red)}.card.o:before{background:#f4a300}
+.card .t{font-size:14px;color:var(--mut)}
+.card .v{font-size:clamp(24px,5vw,32px);font-weight:800;margin-top:2px;font-variant-numeric:tabular-nums}
+.card .p{position:absolute;right:12px;top:12px;font-size:12px;font-weight:700;background:var(--bg);color:var(--pri);padding:3px 8px;border-radius:99px}
+.bin{width:100%;margin-top:4px;font-size:clamp(22px,5vw,28px);font-weight:800;padding:6px 10px;border-radius:10px;border:1.5px solid var(--bd);background:var(--bg);color:var(--tx);outline:none;font-variant-numeric:tabular-nums}.bin:focus{border-color:var(--red)}
+.arrow{text-align:center;color:var(--pri);font-size:22px;margin:6px 0 0;line-height:1}
+.bar{height:12px;border-radius:99px;overflow:hidden;display:flex;margin-top:12px;background:var(--bd)}
+.bar i{display:block;height:100%;transition:width .5s}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--mut);margin-top:8px}
+.legend b{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px}
+.note{margin-top:22px;font-size:12px;color:var(--mut)}
+@media(max-width:640px){.inputs,.c2,.c3{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>💰 Модель счетов</h1>
+  <p class="sub">Введи доход — и увидишь, как он распределяется по счетам.</p>
+
+  <div class="inputs">
+    <div>
+      <label for="inc">Общий доход, сомони</label>
+      <input id="inc" type="number" inputmode="decimal" min="0" value="20000">
+      <small>Пример: 20 000 сомони</small>
+    </div>
+  </div>
+
+  <div class="lvl"><h2>1 · Общий доход → семейный доход</h2>
+    <div class="row c3">
+      <div class="card o"><span class="p">10%</span><div class="t">Благотворительность</div><div class="v" data-k="ch"></div></div>
+      <div class="card o"><span class="p">10%</span><div class="t">Родителям</div><div class="v" data-k="par"></div></div>
+      <div class="card"><span class="p">80%</span><div class="t">Семейный доход</div><div class="v" data-k="fam"></div></div>
+    </div>
+    <div class="arrow">↓</div>
+  </div>
+
+  <div class="lvl"><h2>2 · Делим семейный доход</h2>
+    <div class="row c3">
+      <div class="card g"><span class="p">10%</span><div class="t">Для будущего</div><div class="v" data-k="fut"></div></div>
+      <div class="card o"><span class="p">10%</span><div class="t">Для развлечения</div><div class="v" data-k="fun"></div></div>
+      <div class="card"><span class="p">80%</span><div class="t">Месячный доход</div><div class="v" data-k="mon"></div></div>
+    </div>
+    <div class="arrow">↓</div>
+  </div>
+
+  <div class="lvl"><h2>3 · Месячный доход → счета</h2>
+    <div class="row c2">
+      <div class="card"><span class="p">55%</span><div class="t">Счёт компании</div><div class="v" data-k="comp"></div></div>
+      <div class="card"><span class="p">45%</span><div class="t">Собственный счёт</div><div class="v" data-k="own"></div></div>
+    </div>
+    <div class="arrow">↓</div>
+  </div>
+
+  <div class="lvl"><h2>4 · Капитал, мечта и расходы</h2>
+    <div class="row c3">
+      <div class="card g"><span class="p">80%</span><div class="t">Капитал (со счёта компании)</div><div class="v" data-k="cap"></div></div>
+      <div class="card o"><span class="p">20%</span><div class="t">Мечта</div><div class="v" data-k="dream"></div></div>
+      <div class="card r"><div class="t">Бюджет расходов семьи</div><input id="bud" class="bin" type="number" inputmode="decimal" min="0" value="5000"><div class="t" style="font-size:12px;margin-top:4px">Можно изменить вручную</div></div>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <div class="card"><div class="t">Фин. защита (расходы × 12)</div><div class="v" data-k="prot"></div></div>
+    </div>
+  </div>
+
+  <div class="lvl"><h2>Структура дохода</h2>
+    <div class="card" style="padding:16px">
+      <div class="bar" id="bar"></div>
+      <div class="legend" id="leg"></div>
+    </div>
+  </div>
+
+  <p class="note">В капитал также идут долги, проданные вещи и непредвиденные доходы. Расчёт ориентировочный.</p>
+</div>
+
+<script>
+(function(){
+  var inc=document.getElementById('inc'),bud=document.getElementById('bud'),budTouched=false;
+  var fmt=function(n){return Math.round(n).toLocaleString('ru-RU').replace(/\u00a0/g,' ')+' с.'};
+  var cur={};
+  function anim(el,to){
+    var from=cur[el.dataset.k]||0,t0=performance.now();
+    cur[el.dataset.k]=to;
+    (function step(t){
+      var p=Math.min(1,(t-t0)/450),e=1-Math.pow(1-p,3);
+      el.textContent=fmt(from+(to-from)*e);
+      if(p<1)requestAnimationFrame(step);
+    })(t0);
+  }
+  function calc(){
+    var I=Math.max(0,parseFloat(inc.value)||0);
+    if(!budTouched)bud.value=Math.round(I*0.25);
+    var B=Math.max(0,parseFloat(bud.value)||0);
+    var fam=I*.8,fut=fam*.1,fun=fam*.1,mon=fam*.8,comp=mon*.55,own=mon*.45;
+    var cap=comp*.8,dream=comp*.2,rest=Math.max(0,own-B);
+    var d={fam:fam,ch:I*.1,par:I*.1,fut:fut,fun:fun,mon:mon,comp:comp,own:own,cap:cap,dream:dream,bud:B,rest:rest,prot:B*12};
+    document.querySelectorAll('[data-k]').forEach(function(el){anim(el,d[el.dataset.k])});
+    var parts=[['Будущее',fut,'#16a37f'],['Развлечения',fun,'#f4a300'],['Капитал',cap,'#0b5a8f'],['Мечта',dream,'#8e5bd6'],['Расходы',Math.min(B,own),'#e5383b'],['В капитал (остаток)',rest,'#4cc9a0']];
+    parts.push(['Благотворительность',I*.1,'#9bb2c7'],['Родителям',I*.1,'#c9a227']);
+    var tot=parts.reduce(function(a,p){return a+p[1]},0)||1;
+    document.getElementById('bar').innerHTML=parts.map(function(p){return '<i style="width:'+(p[1]/tot*100)+'%;background:'+p[2]+'"></i>'}).join('');
+    document.getElementById('leg').innerHTML=parts.map(function(p){return '<span><b style="background:'+p[2]+'"></b>'+p[0]+' · '+Math.round(p[1]/tot*100)+'%</span>'}).join('');
+  }
+  inc.addEventListener('input',calc);
+  bud.addEventListener('input',function(){budTouched=true;calc()});
+  calc();
+})();
+</script>
+</body>
+</html>

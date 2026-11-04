@@ -1,0 +1,1473 @@
+<!DOCTYPE html>
+<!-- saved from url=(0064)file:///C:/Users/User/Desktop/MarathonSuccess/web_app/index.html -->
+<html lang="ru"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Марафон Успеха - Web App</title>
+    <link href="./Марафон Успеха - Web App_files/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0F172A;
+            --surface: #1E293B;
+            --surface-variant: #334155;
+            --border: #475569;
+            --border-glow: #64748B;
+            --cyan: #00D2FF;
+            --blue: #3A86FF;
+            --gold: #FFB703;
+            --amber: #FB8500;
+            --emerald: #10B981;
+            --pink: #F72585;
+            --purple: #8338EC;
+            --text-white: #F8FAFC;
+            --text-muted: #94A3B8;
+            --text-dark: #0A1128;
+            --danger: #EF4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-white);
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        /* Responsive Layout for Mobile & PC Desktop */
+        #app-container {
+            width: 100%;
+            max-width: 1100px;
+            background-color: var(--bg-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            padding-bottom: 80px;
+        }
+
+        /* Top Header */
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 24px;
+            background-color: var(--bg-dark);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .user-badge {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            cursor: pointer;
+        }
+
+        .avatar-circle {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            background: linear-gradient(135deg, rgba(0,210,255,0.35), var(--surface-variant));
+            border: 2px solid var(--cyan);
+            color: var(--cyan);
+            flex-shrink: 0;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--text-white);
+        }
+
+        .role-tag {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-top: 2px;
+        }
+
+        .role-mentor {
+            background: rgba(255, 183, 3, 0.2);
+            color: var(--gold);
+        }
+
+        .role-student {
+            background: rgba(0, 210, 255, 0.2);
+            color: var(--cyan);
+        }
+
+        .notification-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background-color: var(--surface-variant);
+            border: 1px solid var(--border);
+            padding: 8px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            color: var(--cyan);
+            font-weight: 700;
+            font-size: 13px;
+            transition: 0.2s;
+        }
+
+        .notification-btn:hover {
+            border-color: var(--cyan);
+        }
+
+        /* Navigation Bar (Desktop & Mobile Adaptable) */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 1100px;
+            height: 65px;
+            background-color: var(--surface);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid var(--border);
+            z-index: 1000;
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 11px;
+            transition: 0.2s;
+            flex: 1;
+            padding: 8px 0;
+        }
+
+        .nav-item i {
+            font-size: 18px;
+        }
+
+        .nav-item.active {
+            color: var(--cyan);
+            font-weight: 700;
+        }
+
+        /* Main Responsive Content */
+        .content {
+            padding: 20px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Responsive Grids for PC Desktop */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        @media (min-width: 768px) {
+            .grid-2 { grid-template-columns: 1fr 1fr; }
+            .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+        }
+
+        /* Cards & Styling */
+        .card {
+            background-color: var(--surface);
+            border-radius: 18px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            transition: 0.2s;
+        }
+
+        .card-gold {
+            background: linear-gradient(135deg, rgba(38,25,4,1) 0%, var(--surface) 100%);
+            border-color: rgba(255, 183, 3, 0.7);
+        }
+
+        .btn {
+            padding: 10px 18px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+
+        .btn-cyan { background-color: var(--cyan); color: var(--text-dark); }
+        .btn-gold { background-color: var(--gold); color: var(--text-dark); }
+        .btn-surface { background-color: var(--surface-variant); color: var(--text-white); }
+        .btn-danger { background-color: var(--danger); color: var(--text-white); }
+        .btn-full { width: 100%; }
+
+        /* Donut Chart SVG */
+        .donut-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .donut-svg-wrap {
+            position: relative;
+            width: 170px;
+            height: 170px;
+        }
+
+        .donut-svg {
+            transform: rotate(-90deg);
+            width: 100%;
+            height: 100%;
+        }
+
+        .donut-center {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .donut-percent {
+            font-size: 28px;
+            font-weight: 800;
+        }
+
+        .donut-label {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* Quick Actions Grid */
+        .quick-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        @media (min-width: 768px) {
+            .quick-grid { grid-template-columns: 1fr 1fr 1fr 1fr; }
+        }
+
+        .quick-card {
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: 0.2s;
+        }
+
+        .quick-card:hover {
+            border-color: var(--cyan);
+            transform: translateY(-2px);
+        }
+
+        .quick-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        /* Tasks Form */
+        .task-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .task-item-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: var(--surface);
+            padding: 14px 16px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+        }
+
+        .checkbox {
+            width: 22px;
+            height: 22px;
+            accent-color: var(--cyan);
+            cursor: pointer;
+        }
+
+        input[type="text"], input[type="password"], input[type="date"], textarea, select {
+            width: 100%;
+            padding: 12px 14px;
+            background-color: var(--surface-variant);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-white);
+            font-size: 14px;
+            outline: none;
+        }
+
+        input[type="text"]:focus, input[type="password"]:focus, textarea:focus {
+            border-color: var(--cyan);
+        }
+
+        /* Filter Chips Bar */
+        .filter-bar {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            white-space: nowrap;
+        }
+
+        .filter-chip {
+            padding: 8px 16px;
+            border-radius: 12px;
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text-white);
+            font-size: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .filter-chip.active {
+            background-color: var(--cyan);
+            color: var(--text-dark);
+            font-weight: 700;
+        }
+
+        /* Chat UI */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 220px);
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding-right: 4px;
+        }
+
+        .chat-bubble {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 16px;
+            font-size: 14px;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+
+        .chat-mine {
+            align-self: flex-end;
+            background-color: rgba(0, 210, 255, 0.2);
+            border: 1px solid rgba(0, 210, 255, 0.5);
+            border-bottom-right-radius: 4px;
+        }
+
+        .chat-other {
+            align-self: flex-start;
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            border-bottom-left-radius: 4px;
+        }
+
+        .chat-sender {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--cyan);
+            margin-bottom: 4px;
+        }
+
+        .chat-time {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 4px;
+            text-align: right;
+        }
+
+        .chat-input-bar {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            background-color: var(--bg-dark);
+            padding-top: 10px;
+        }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.75);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .modal-content {
+            background-color: var(--surface);
+            border-radius: 20px;
+            padding: 24px;
+            width: 100%;
+            max-width: 440px;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* Login Screen */
+        .login-screen {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background-color: var(--bg-dark);
+            z-index: 3000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .login-card {
+            background-color: var(--surface);
+            border-radius: 24px;
+            padding: 30px;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        /* SVG Line Chart Style */
+        .line-chart-svg {
+            width: 100%;
+            height: 180px;
+            overflow: visible;
+        }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+<div id="app-container">
+    <!-- Top Header Bar -->
+    <div class="top-bar">
+        <div class="user-badge" onclick="switchTab('profile')">
+            <div class="avatar-circle" id="top-avatar">
+                <i class="fa-solid fa-user"></i>
+            </div>
+            <div class="user-info">
+                <span class="user-name" id="top-user-name">Главный Наставник</span>
+                <div>
+                    <span class="role-tag role-mentor" id="top-user-role">Наставник</span>
+                </div>
+            </div>
+        </div>
+        <div class="notification-btn" onclick="switchTab('history')">
+            <i class="fa-solid fa-bell"></i>
+            <span id="top-notification-count">13</span>
+        </div>
+    </div>
+
+    <!-- Main Content Body -->
+    <div class="content" id="main-content">
+            <!-- Motivation Card -->
+            <div class="card card-gold">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="color:var(--gold); font-weight:700;"><i class="fa-solid fa-lightbulb"></i> Мотивация дня</span>
+                    <span style="color:var(--text-muted); font-size:11px;">День 4 из 30</span>
+                </div>
+                <p style="font-size:15px; margin-top:10px; font-weight:500;">«НЕ НАЗЫВАЙ КОНЦОМ ТО, ЧТО МОЖЕТ ОКАЗАТЬСЯ НОВОЙ ГЛАВОЙ. Если ты сейчас в трудном периоде - продолжай путь.
+»</p>
+                <p style="font-size:12px; color:var(--text-muted); text-align:right; margin-top:4px;">— Марафон </p>
+            </div>
+
+            <!-- Circular Donut Chart -->
+            <div class="card donut-container">
+                <div style="width:100%; display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <div style="font-weight:700; font-size:16px;">Отчеты учеников марафона</div>
+                        <div style="color:var(--text-muted); font-size:12px;">Всего учеников: 3</div>
+                    </div>
+                    <span class="role-tag role-student" style="font-size:12px;">0 отчетов</span>
+                </div>
+                <div class="donut-svg-wrap">
+                    <svg class="donut-svg" viewBox="0 0 36 36">
+                        <path stroke="var(--border)" stroke-width="3.8" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"></path>
+                        <path stroke="var(--cyan)" stroke-width="3.8" stroke-dasharray="100, 100" stroke-linecap="round" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"></path>
+                    </svg>
+                    <div class="donut-center">
+                        <div class="donut-percent">0</div>
+                        <div class="donut-label">Всего отчетов</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <!-- Bottom Navigation Bar -->
+    <div class="bottom-nav" id="bottom-nav">
+            <div class="nav-item active" onclick="switchTab('home')">
+                <i class="fa-solid fa-home"></i>
+                <span>Главная</span>
+            </div>
+        
+            <div class="nav-item " onclick="switchTab('mentor')">
+                <i class="fa-solid fa-users"></i>
+                <span>Ученики</span>
+            </div>
+        
+            <div class="nav-item " onclick="switchTab('analytics')">
+                <i class="fa-solid fa-chart-column"></i>
+                <span>Аналитика</span>
+            </div>
+        
+            <div class="nav-item " onclick="switchTab('chat')">
+                <i class="fa-solid fa-comments"></i>
+                <span>Чат</span>
+            </div>
+        
+            <div class="nav-item " onclick="switchTab('history')">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                <span>История</span>
+            </div>
+        </div>
+</div>
+
+<!-- Clean Login Screen (No Quick Buttons) -->
+<div class="login-screen hidden" id="login-screen">
+    <div class="login-card">
+        <div style="text-align: center;">
+            <i class="fa-solid fa-trophy" style="font-size: 48px; color: var(--gold); margin-bottom: 12px;"></i>
+            <h2 style="font-size: 24px; font-weight: 800;">Марафон Успеха</h2>
+            <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">Онлайн база данных Google Sheets</p>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 10px;">
+            <div>
+                <label style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px; display: block;">Логин</label>
+                <input type="text" id="login-username" placeholder="Введите ваш логин">
+            </div>
+            <div>
+                <label style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px; display: block;">Пароль</label>
+                <input type="password" id="login-password" placeholder="Введите пароль">
+            </div>
+            <button class="btn btn-cyan btn-full" style="padding: 14px; font-size: 15px; margin-top: 6px;" onclick="handleLogin()" id="login-btn">Войти в марафон</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Container -->
+<div class="modal-overlay hidden" id="modal-container">
+    <div class="modal-content" id="modal-body"></div>
+</div>
+
+<script>
+    // ============================================================================
+    // GOOGLE APPS SCRIPT API CONFIG
+    // ============================================================================
+    const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbxH_ahjT5hIPL9QwYAM5m1XKSy25nAkq44A7uxB6BpeojePRXVjGdln-qFHtRqgXErK/exec";
+
+    let state = {
+        currentUser: JSON.parse(localStorage.getItem('web_user')) || null,
+        activeTab: 'home',
+        reports: [],
+        users: [],
+        messages: [],
+        quotes: [],
+        chatTab: 'ALL_CHAT',
+        relaxationTab: 'AUDIO',
+        historyPeriodFilter: 'ALL', // 'WEEK', 'MONTH', 'ALL'
+        historyStudentFilter: null,
+        startDate: '2024-01-01',
+        endDate: new Date().toISOString().split('T')[0],
+        analyticsPeriodDays: 30
+    };
+
+    // ============================================================================
+    // API HELPERS (CORS-Safe for Google Apps Script Web App)
+    // ============================================================================
+    async function postAPI(data) {
+        try {
+            const res = await fetch(WEBHOOK_URL, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify(data)
+            });
+            return await res.json();
+        } catch (e) {
+            console.error("API POST Error:", e);
+            return { status: "error", message: e.message };
+        }
+    }
+
+    async function getAPI(action, params = {}) {
+        try {
+            let url = `${WEBHOOK_URL}?action=${action}`;
+            for (let k in params) {
+                if (params[k]) url += `&${k}=${encodeURIComponent(params[k])}`;
+            }
+            const res = await fetch(url);
+            return await res.json();
+        } catch (e) {
+            console.error("API GET Error:", e);
+            return { status: "error", message: e.message };
+        }
+    }
+
+    // ============================================================================
+    // DATA SYNC
+    // ============================================================================
+    async function syncAllData() {
+        if (!state.currentUser) return;
+
+        const [usersRes, reportsRes, quotesRes, msgsRes] = await Promise.all([
+            getAPI('get_users'),
+            getAPI('get_reports'),
+            getAPI('get_quotes'),
+            getAPI('get_messages', { userId: state.currentUser.id })
+        ]);
+
+        if (usersRes.users) state.users = usersRes.users;
+        if (reportsRes.reports) state.reports = reportsRes.reports;
+        if (quotesRes.quotes) state.quotes = quotesRes.quotes;
+        if (msgsRes.messages) state.messages = msgsRes.messages;
+
+        // Update notification count
+        const notifCount = state.reports.length + state.messages.length;
+        document.getElementById('top-notification-count').innerText = notifCount;
+
+        render();
+    }
+
+    // ============================================================================
+    // AUTHENTICATION
+    // ============================================================================
+    async function handleLogin() {
+        const loginInput = document.getElementById('login-username').value.trim();
+        const passInput = document.getElementById('login-password').value.trim();
+
+        if (!loginInput || !passInput) {
+            alert('Пожалуйста, введите логин и пароль');
+            return;
+        }
+
+        const btn = document.getElementById('login-btn');
+        btn.innerText = 'Вход...';
+
+        const res = await postAPI({ action: 'login', login: loginInput, password: passInput });
+        btn.innerText = 'Войти в марафон';
+
+        if (res.status === 'success' && res.user) {
+            state.currentUser = res.user;
+            localStorage.setItem('web_user', JSON.stringify(res.user));
+            document.getElementById('login-screen').classList.add('hidden');
+            await syncAllData();
+        } else {
+            alert(res.message || 'Ошибка входа');
+        }
+    }
+
+    function logout() {
+        state.currentUser = null;
+        localStorage.removeItem('web_user');
+        render();
+    }
+
+    // ============================================================================
+    // RENDER & NAVIGATION
+    // ============================================================================
+    function switchTab(tab) {
+        state.activeTab = tab;
+        render();
+    }
+
+    function renderNav() {
+        const isMentor = state.currentUser && state.currentUser.role === 'MENTOR';
+
+        const items = isMentor ? [
+            { tab: 'home', title: 'Главная', icon: 'fa-home' },
+            { tab: 'mentor', title: 'Ученики', icon: 'fa-users' },
+            { tab: 'analytics', title: 'Аналитика', icon: 'fa-chart-column' },
+            { tab: 'chat', title: 'Чат', icon: 'fa-comments' },
+            { tab: 'history', title: 'История', icon: 'fa-clock-rotate-left' }
+        ] : [
+            { tab: 'home', title: 'Главная', icon: 'fa-home' },
+            { tab: 'tasks', title: 'Задания', icon: 'fa-list-check' },
+            { tab: 'chat', title: 'Чат', icon: 'fa-comments' },
+            { tab: 'relaxation', title: 'Расслабление', icon: 'fa-spa' },
+            { tab: 'history', title: 'История', icon: 'fa-clock-rotate-left' }
+        ];
+
+        document.getElementById('bottom-nav').innerHTML = items.map(i => `
+            <div class="nav-item ${state.activeTab === i.tab ? 'active' : ''}" onclick="switchTab('${i.tab}')">
+                <i class="fa-solid ${i.icon}"></i>
+                <span>${i.title}</span>
+            </div>
+        `).join('');
+    }
+
+    function renderTopBar() {
+        if (!state.currentUser) return;
+        document.getElementById('top-user-name').innerText = state.currentUser.name;
+        const tag = document.getElementById('top-user-role');
+        if (state.currentUser.role === 'MENTOR') {
+            tag.innerText = 'Наставник';
+            tag.className = 'role-tag role-mentor';
+        } else {
+            tag.innerText = `Ученик • 🔥 ${state.currentUser.streakDays || 0} дн.`;
+            tag.className = 'role-tag role-student';
+        }
+    }
+
+    function render() {
+        if (!state.currentUser) {
+            document.getElementById('login-screen').classList.remove('hidden');
+            return;
+        }
+        document.getElementById('login-screen').classList.add('hidden');
+        renderTopBar();
+        renderNav();
+
+        const c = document.getElementById('main-content');
+        c.innerHTML = '';
+
+        if (state.activeTab === 'home') renderHome(c);
+        else if (state.activeTab === 'mentor') renderMentor(c);
+        else if (state.activeTab === 'analytics') renderAnalytics(c);
+        else if (state.activeTab === 'tasks') renderTasks(c);
+        else if (state.activeTab === 'chat') renderChat(c);
+        else if (state.activeTab === 'relaxation') renderRelaxation(c);
+        else if (state.activeTab === 'history') renderHistory(c);
+        else if (state.activeTab === 'profile') renderProfile(c);
+    }
+
+    // ============================================================================
+    // HOME SCREEN
+    // ============================================================================
+    function renderHome(c) {
+        const isMentor = state.currentUser.role === 'MENTOR';
+        const day = new Date().getDate();
+        const quote = state.quotes.find(q => q.dayOfMonth == day) || { text: 'Дисциплина — залог успеха!', author: 'Марафон Успеха' };
+        const todayStr = new Date().toISOString().split('T')[0];
+        const todayRep = state.reports.find(r => r.userId === state.currentUser.id && r.date === todayStr);
+
+        let completed = isMentor ? state.reports.length : (todayRep ? todayRep.completedCoreTasksCount : 0);
+        let percent = isMentor ? 100 : Math.round((completed / 9) * 100);
+
+        let html = `
+            <!-- Motivation Card -->
+            <div class="card card-gold">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="color:var(--gold); font-weight:700;"><i class="fa-solid fa-lightbulb"></i> Мотивация дня</span>
+                    <span style="color:var(--text-muted); font-size:11px;">День ${day} из 30</span>
+                </div>
+                <p style="font-size:15px; margin-top:10px; font-weight:500;">«${quote.text}»</p>
+                <p style="font-size:12px; color:var(--text-muted); text-align:right; margin-top:4px;">— ${quote.author}</p>
+            </div>
+
+            <!-- Circular Donut Chart -->
+            <div class="card donut-container">
+                <div style="width:100%; display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <div style="font-weight:700; font-size:16px;">${isMentor ? 'Отчеты учеников марафона' : 'Выполнение 9 заданий дня'}</div>
+                        <div style="color:var(--text-muted); font-size:12px;">${isMentor ? `Всего учеников: ${state.users.filter(u=>u.role==='STUDENT').length}` : (todayRep ? `Дата: ${todayRep.date}` : 'Отчет не отправлен')}</div>
+                    </div>
+                    <span class="role-tag role-student" style="font-size:12px;">${completed} ${isMentor ? 'отчетов' : 'из 9'}</span>
+                </div>
+                <div class="donut-svg-wrap">
+                    <svg class="donut-svg" viewBox="0 0 36 36">
+                        <path stroke="var(--border)" stroke-width="3.8" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <path stroke="var(--cyan)" stroke-width="3.8" stroke-dasharray="${percent}, 100" stroke-linecap="round" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    </svg>
+                    <div class="donut-center">
+                        <div class="donut-percent">${isMentor ? completed : percent + '%'}</div>
+                        <div class="donut-label">${isMentor ? 'Всего отчетов' : 'Прогресс'}</div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Quick Actions (Student only)
+        if (!isMentor) {
+            html += `
+                <div>
+                    <div style="font-weight:700; font-size:16px; margin-bottom:12px;">Быстрые действия</div>
+                    <div class="quick-grid">
+                        <div class="quick-card" onclick="switchTab('relaxation')">
+                            <div class="quick-icon" style="background:rgba(0,210,255,0.2); color:var(--cyan);"><i class="fa-solid fa-spa"></i></div>
+                            <div style="font-weight:700;">Расслабление</div>
+                        </div>
+                        <div class="quick-card" onclick="switchTab('tasks')">
+                            <div class="quick-icon" style="background:rgba(255,183,3,0.2); color:var(--gold);"><i class="fa-solid fa-list-check"></i></div>
+                            <div style="font-weight:700;">Задание дня</div>
+                        </div>
+                        <div class="quick-card" onclick="switchTab('chat')">
+                            <div class="quick-icon" style="background:rgba(16,185,129,0.2); color:var(--emerald);"><i class="fa-solid fa-comments"></i></div>
+                            <div style="font-weight:700;">Чат</div>
+                        </div>
+                        <div class="quick-card" onclick="switchTab('relaxation')">
+                            <div class="quick-icon" style="background:rgba(131,56,236,0.2); color:var(--purple);"><i class="fa-solid fa-wind"></i></div>
+                            <div style="font-weight:700;">Дыхание</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        c.innerHTML = html;
+    }
+
+    // ============================================================================
+    // MENTOR DASHBOARD
+    // ============================================================================
+    function renderMentor(c) {
+        const students = state.users.filter(u => u.role === 'STUDENT');
+        const todayStr = new Date().toISOString().split('T')[0];
+        const submittedToday = students.filter(s => state.reports.some(r => r.userId === s.id && r.date === todayStr)).length;
+
+        let html = `
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h2 style="font-size:22px; font-weight:800;">Панель Наставника</h2>
+                <button class="btn btn-surface" onclick="syncAllData()"><i class="fa-solid fa-rotate"></i></button>
+            </div>
+
+            <!-- Metrics Grid -->
+            <div class="grid-2">
+                <div class="card">
+                    <div style="color:var(--text-muted); font-size:12px;">Всего учеников</div>
+                    <div style="font-size:26px; font-weight:800; margin-top:4px;">${students.length}</div>
+                </div>
+                <div class="card">
+                    <div style="color:var(--text-muted); font-size:12px;">Сдали сегодня</div>
+                    <div style="font-size:26px; font-weight:800; color:var(--emerald); margin-top:4px;">${submittedToday} / ${students.length}</div>
+                </div>
+            </div>
+
+            <!-- Update Motivation Card -->
+            <div class="card card-gold">
+                <div style="font-weight:700; color:var(--gold); font-size:16px; margin-bottom:6px;"><i class="fa-solid fa-bullhorn"></i> Мотивация дня</div>
+                <p style="color:var(--text-muted); font-size:12px; margin-bottom:12px;">Установите мотивационный текст на сегодняшний день:</p>
+                <textarea id="mentor-mot-input" rows="3" placeholder="Введите текст мотивации..."></textarea>
+                <button class="btn btn-gold btn-full" style="margin-top:10px; font-size:14px;" onclick="saveMotivation()">ОБНОВИТЬ</button>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+                <div style="font-weight:700; font-size:18px;">Список учеников (${students.length})</div>
+                <button class="btn btn-cyan" onclick="openAddStudentModal()"><i class="fa-solid fa-user-plus"></i> Добавить</button>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:12px;">
+        `;
+
+        students.forEach(s => {
+            const hasSubmitted = state.reports.some(r => r.userId === s.id && r.date === todayStr);
+            const userReportsCount = state.reports.filter(r => r.userId === s.id).length;
+
+            html += `
+                <div class="card" style="display:flex; flex-direction:column; gap:12px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <div style="font-weight:700; font-size:16px;">${s.name}</div>
+                            <div style="color:var(--text-muted); font-size:12px;">Логин: ${s.login} • ${s.phoneOrNote || 'Без заметок'}</div>
+                        </div>
+                        <span class="role-tag" style="background: ${hasSubmitted ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)'}; color: ${hasSubmitted ? 'var(--emerald)' : 'var(--danger)'}; padding: 6px 10px; font-size: 11px;">
+                            ${hasSubmitted ? 'Сдал' : 'Не сдал'}
+                        </span>
+                    </div>
+
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border); padding-top:12px;">
+                        <span style="font-size:13px;">Отчетов: <b>${userReportsCount}</b> | 🔥 <b>${s.streakDays || 0} дн.</b></span>
+                        <button class="btn btn-surface" style="color:var(--danger);" onclick="deleteUser('${s.id}')"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>
+            `;
+        });
+
+        html += `</div>`;
+        c.innerHTML = html;
+    }
+
+    async function saveMotivation() {
+        const t = document.getElementById('mentor-mot-input').value.trim();
+        if (!t) return alert('Введите текст!');
+        const res = await postAPI({ action: 'update_quote', quote: { dayOfMonth: new Date().getDate(), text: t, author: state.currentUser.name, category: 'Мотивация дня' } });
+        if (res.status === 'success') { alert('Мотивация обновлена!'); syncAllData(); }
+    }
+
+    function openAddStudentModal() {
+        const modal = document.getElementById('modal-container');
+        const body = document.getElementById('modal-body');
+
+        body.innerHTML = `
+            <h3 style="font-size: 18px; font-weight: 700;">Добавить ученика</h3>
+            <input type="text" id="new-name" placeholder="Имя и Фамилия">
+            <input type="text" id="new-login" placeholder="Логин">
+            <input type="password" id="new-pass" placeholder="Пароль" value="123">
+            <input type="text" id="new-phone" placeholder="Телефон или заметка">
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                <button class="btn btn-surface" style="flex:1;" onclick="closeModal()">Отмена</button>
+                <button class="btn btn-cyan" style="flex:1;" onclick="submitAddStudent()">Создать</button>
+            </div>
+        `;
+        modal.classList.remove('hidden');
+    }
+
+    async function submitAddStudent() {
+        const name = document.getElementById('new-name').value.trim();
+        const login = document.getElementById('new-login').value.trim();
+        const pass = document.getElementById('new-pass').value.trim();
+        const phone = document.getElementById('new-phone').value.trim();
+
+        if (!name || !login || !pass) return alert('Заполните обязательные поля!');
+
+        const newUser = {
+            id: 'student_' + Math.random().toString(36).substr(2, 8),
+            login, name, role: 'STUDENT', streakDays: 0, totalReports: 0, phoneOrNote: phone
+        };
+
+        const res = await postAPI({ action: 'add_user', user: newUser, password: pass });
+        if (res.status === 'success') {
+            alert('Ученик добавлен!');
+            closeModal();
+            await syncAllData();
+        } else {
+            alert('Ошибка: ' + res.message);
+        }
+    }
+
+    async function deleteUser(id) {
+        if (!confirm('Удалить ученика?')) return;
+        await postAPI({ action: 'delete_user', userId: id });
+        syncAllData();
+    }
+
+    function closeModal() {
+        document.getElementById('modal-container').classList.add('hidden');
+    }
+
+    // ============================================================================
+    // MENTOR ANALYTICS (Exact Cyan Line Chart Replica)
+    // ============================================================================
+    function renderAnalytics(c) {
+        const students = state.users.filter(u => u.role === 'STUDENT');
+        if (!state.analyticsStudentFilter && students.length > 0) {
+            state.analyticsStudentFilter = students[0].id;
+        }
+        if (!state.analyticsTaskFilter) {
+            state.analyticsTaskFilter = 'ALL';
+        }
+        if (!state.analyticsPeriodFilter || state.analyticsPeriodFilter === 'ALL') {
+            state.analyticsPeriodFilter = 'MONTH';
+        }
+
+        const selectedStudentObj = students.find(s => s.id === state.analyticsStudentFilter) || students[0];
+
+        // 1. Filter reports by selected student
+        let filteredReports = state.reports.filter(r => r.userId === (selectedStudentObj ? selectedStudentObj.id : ''));
+
+        // 2. Filter reports by time period
+        const days = state.analyticsPeriodFilter === 'WEEK' ? 7 : 30;
+        const nowTime = new Date().getTime();
+        const cutoffTime = nowTime - (days * 24 * 60 * 60 * 1000);
+        filteredReports = filteredReports.filter(r => new Date(r.date).getTime() >= cutoffTime);
+
+        // 3. Daily completion percentage calculation (0% to 100%)
+        const chartPoints = [];
+        const taskKey = state.analyticsTaskFilter;
+
+        for (let i = days - 1; i >= 0; i--) {
+            const d = new Date();
+            d.setDate(d.getDate() - i);
+            const dateStr = d.toISOString().split('T')[0];
+            const rep = filteredReports.find(r => r.date === dateStr);
+
+            let pct = 0;
+            if (rep) {
+                if (taskKey === 'ALL') {
+                    pct = Math.round(((rep.completedCoreTasksCount || 0) / 9) * 100);
+                } else if (taskKey === 't1') {
+                    pct = (rep.physicalExerciseMin && rep.physicalExerciseMin !== '0') ? 100 : 0;
+                } else if (taskKey === 't2') {
+                    pct = (rep.relaxationMin && rep.relaxationMin !== '0') ? 100 : 0;
+                } else if (taskKey === 't3') {
+                    pct = rep.readingBookDetails ? 100 : 0;
+                } else if (taskKey === 't4') {
+                    pct = rep.memoryCompleted ? 100 : 0;
+                } else if (taskKey === 't5') {
+                    pct = rep.planCompleted ? 100 : 0;
+                } else if (taskKey === 't6') {
+                    pct = rep.goalCompleted ? 100 : 0;
+                } else if (taskKey === 't7') {
+                    pct = rep.smileCompleted ? 100 : 0;
+                } else if (taskKey === 't8') {
+                    pct = rep.confidenceCompleted ? 100 : 0;
+                } else if (taskKey === 't9') {
+                    pct = rep.affirmationCompleted ? 100 : 0;
+                }
+            }
+            chartPoints.push(pct);
+        }
+
+        const finalPoints = chartPoints;
+
+        // SVG Path String (0% to 100% Y mapping)
+        const svgW = 600;
+        const svgH = 180;
+        const stepX = finalPoints.length > 1 ? svgW / (finalPoints.length - 1) : svgW;
+
+        const pointStr = finalPoints.map((pct, idx) => {
+            const x = idx * stepX;
+            const clampedPct = Math.min(100, Math.max(0, pct));
+            const y = (svgH - 20) - (clampedPct / 100) * (svgH - 40);
+            return `${x.toFixed(1)},${y.toFixed(1)}`;
+        }).join(' ');
+
+        // Generate equal interval dates for X-Axis (e.g. 6 evenly spaced dates)
+        const tickCount = days <= 7 ? 7 : 6;
+        const xDateLabels = [];
+        const stepDays = (days - 1) / (tickCount - 1);
+        for (let i = 0; i < tickCount; i++) {
+            const offsetDays = (days - 1) - Math.round(i * stepDays);
+            const t = new Date(nowTime - (offsetDays * 24 * 3600 * 1000));
+            xDateLabels.push(`${t.getDate()} ${monthsRu[t.getMonth()]}`);
+        }
+
+        const taskNames = {
+            ALL: 'Общий прогресс (9 задач)',
+            t1: 'Физ. нагрузки', t2: 'Расслабление', t3: 'Чтение книги',
+            t4: 'Хотира', t5: 'План', t6: 'Работа над целью',
+            t7: 'Улыбка', t8: 'Уверенность', t9: 'Аффирмация'
+        };
+
+        let html = `
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h2 style="font-size:22px; font-weight:800;">Аналитика Наставника 📊</h2>
+                <button class="btn btn-surface" onclick="syncAllData()"><i class="fa-solid fa-rotate"></i></button>
+            </div>
+
+            <!-- Filter 1: Ученики (NO "Все" option) -->
+            <div style="display:flex; flex-direction:column; gap:6px;">
+                <span style="font-size:12px; color:var(--text-muted); font-weight:700;">Ученик:</span>
+                <div class="filter-bar">
+                    ${students.map(u => `
+                        <div class="filter-chip ${selectedStudentObj && selectedStudentObj.id === u.id ? 'active' : ''}" onclick="setAnalyticsStudent('${u.id}')">${u.name}</div>
+                    `).join('')}
+                </div>
+            </div>
+
+            <!-- Filter 2: Задания -->
+            <div style="display:flex; flex-direction:column; gap:6px;">
+                <span style="font-size:12px; color:var(--text-muted); font-weight:700;">Задание:</span>
+                <div class="filter-bar">
+                    <div class="filter-chip ${state.analyticsTaskFilter === 'ALL' ? 'active' : ''}" onclick="setAnalyticsTask('ALL')">Общий прогресс (9 задач)</div>
+                    <div class="filter-chip ${state.analyticsTaskFilter === 't1' ? 'active' : ''}" onclick="setAnalyticsTask('t1')">Физ. нагрузки</div>
+                    <div class="filter-chip ${state.analyticsTaskFilter === 't2' ? 'active' : ''}" onclick="setAnalyticsTask('t2')">Расслабление</div>
+                    <div class="filter-chip ${state.analyticsTaskFilter === 't3' ? 'active' : ''}" onclick="setAnalyticsTask('t3')">Чтение книги</div>
+                    <div class="filter-chip ${state.analyticsTaskFilter === 't4' ? 'active' : ''}" onclick="setAnalyticsTask('t4')">Хотира</div>
+                    <div class="filter-chip ${state.analyticsTaskFilter === 't5' ? 'active' : ''}" onclick="setAnalyticsTask('t5')">План</div>
+                    <div class="filter-chip ${state.analyticsTaskFilter === 't6' ? 'active' : ''}" onclick="setAnalyticsTask('t6')">Работа над целью</div>
+                    <div class="filter-chip ${state.analyticsTaskFilter === 't7' ? 'active' : ''}" onclick="setAnalyticsTask('t7')">Улыбка</div>
+                    <div class="filter-chip ${state.analyticsTaskFilter === 't8' ? 'active' : ''}" onclick="setAnalyticsTask('t8')">Уверенность</div>
+                    <div class="filter-chip ${state.analyticsTaskFilter === 't9' ? 'active' : ''}" onclick="setAnalyticsTask('t9')">Аффирмация</div>
+                </div>
+            </div>
+
+            <!-- Filter 3: Период (NO "Все" option) -->
+            <div style="display:flex; flex-direction:column; gap:6px;">
+                <span style="font-size:12px; color:var(--text-muted); font-weight:700;">Период:</span>
+                <div class="filter-bar">
+                    <div class="filter-chip ${state.analyticsPeriodFilter === 'WEEK' ? 'active' : ''}" onclick="setAnalyticsPeriod('WEEK')">За неделю</div>
+                    <div class="filter-chip ${state.analyticsPeriodFilter === 'MONTH' ? 'active' : ''}" onclick="setAnalyticsPeriod('MONTH')">За месяц (30 дней)</div>
+                </div>
+            </div>
+
+            <!-- Cyan Line Chart Card (Y-Axis 0..100% and X-Axis Date Intervals) -->
+            <div class="card" style="background:#1E222D; border-radius:18px; padding:24px; display:flex; flex-direction:column; gap:16px;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <div style="font-size:17px; font-weight:800; color:#F8FAFC;">${taskNames[state.analyticsTaskFilter] || 'Задание'}</div>
+                        <div style="font-size:13px; color:var(--cyan); font-weight:600; margin-top:2px;">
+                            Ученик: ${selectedStudentObj ? selectedStudentObj.name : '—'}
+                        </div>
+                    </div>
+                    <span style="font-weight:700; color:var(--cyan); font-size:14px;">Ось Y: 0% — 100%</span>
+                </div>
+
+                <div style="display:flex; gap:12px; align-items:stretch;">
+                    <!-- Y-Axis Labels Column -->
+                    <div style="display:flex; flex-direction:column; justify-content:space-between; font-size:11px; font-weight:700; color:#94A3B8; text-align:right; width:38px; padding-bottom:10px;">
+                        <span>100%</span>
+                        <span>75%</span>
+                        <span>50%</span>
+                        <span>25%</span>
+                        <span>0%</span>
+                    </div>
+
+                    <!-- SVG Line Chart Box -->
+                    <div style="flex:1; overflow-x:auto;">
+                        <svg viewBox="0 0 ${svgW} ${svgH}" style="width:100%; height:180px; overflow:visible;">
+                            <!-- Horizontal Grid Lines (100%, 75%, 50%, 25%, 0%) -->
+                            <line x1="0" y1="14" x2="${svgW}" y2="14" stroke="#2A2D3D" stroke-width="1" />
+                            <line x1="0" y1="52" x2="${svgW}" y2="52" stroke="#2A2D3D" stroke-width="1" />
+                            <line x1="0" y1="90" x2="${svgW}" y2="90" stroke="#2A2D3D" stroke-width="1" />
+                            <line x1="0" y1="128" x2="${svgW}" y2="128" stroke="#2A2D3D" stroke-width="1" />
+                            <line x1="0" y1="166" x2="${svgW}" y2="166" stroke="#2A2D3D" stroke-width="1" />
+
+                            <!-- Sharp Cyan Line -->
+                            <polyline points="${pointStr}" fill="none" stroke="#00D2FF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- X-Axis Dates Row (Equal Intervals) -->
+                <div style="display:flex; justify-content:space-between; color:#94A3B8; font-size:12px; font-weight:600; padding-left:50px;">
+                    ${xDateLabels.map(lbl => `<span>${lbl}</span>`).join('')}
+                </div>
+            </div>
+
+            <!-- Filtered Reports History Section -->
+            <div style="font-weight:800; font-size:18px; margin-top:10px;">История отчетов (по фильтрам)</div>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                ${filteredReports.length === 0 ? `<div class="card" style="text-align:center; color:var(--text-muted); padding:20px;">Отчетов не найдено</div>` : ''}
+                ${filteredReports.sort((a,b) => b.date.localeCompare(a.date)).map(r => `
+                    <div class="card" style="display:flex; flex-direction:column; gap:8px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <div style="font-weight:800; font-size:16px;">${r.date}</div>
+                                <div style="color:var(--cyan); font-weight:700; font-size:13px; margin-top:2px;">Ученик: ${r.userName}</div>
+                            </div>
+                            <span class="role-tag role-student" style="background:rgba(16,185,129,0.2); color:var(--emerald); font-size:13px; padding:6px 12px; font-weight:800;">
+                                ${r.completedCoreTasksCount || 0}/9
+                            </span>
+                        </div>
+                        ${r.comments ? `<div style="color:var(--text-muted); font-size:13px;">💬 ${r.comments}</div>` : ''}
+                    </div>
+                `).join('')}
+            </div>
+        `;
+
+        c.innerHTML = html;
+    }
+
+    function setAnalyticsStudent(id) { state.analyticsStudentFilter = id; render(); }
+    function setAnalyticsTask(taskKey) { state.analyticsTaskFilter = taskKey; render(); }
+    function setAnalyticsPeriod(p) { state.analyticsPeriodFilter = p; render(); }
+
+    // ============================================================================
+    // DAILY TASKS (Student)
+    // ============================================================================
+    function renderTasks(c) {
+        const todayStr = new Date().toISOString().split('T')[0];
+        const existing = state.reports.find(r => r.userId === state.currentUser.id && r.date === todayStr);
+
+        c.innerHTML = `
+            <h2 style="font-size:22px; font-weight:800;">Задание дня (${todayStr})</h2>
+            <div class="task-input-group">
+                <div class="task-item-row"><span>1. Физ. нагрузки (мин)</span><input type="text" id="t1" style="width:70px;" value="${existing ? existing.physicalExerciseMin : '0'}"></div>
+                <div class="task-item-row"><span>2. Расслабление (мин)</span><input type="text" id="t2" style="width:70px;" value="${existing ? existing.relaxationMin : '0'}"></div>
+                <div class="task-item-row"><span>3. Книга (название, стр)</span><input type="text" id="t3" style="width:140px;" value="${existing ? existing.readingBookDetails : ''}"></div>
+                <div class="task-item-row"><span>4. Хотира (память)</span><input type="checkbox" class="checkbox" id="t4" ${existing && existing.memoryCompleted ? 'checked' : ''}></div>
+                <div class="task-item-row"><span>5. План на день</span><input type="checkbox" class="checkbox" id="t5" ${existing && existing.planCompleted ? 'checked' : ''}></div>
+                <div class="task-item-row"><span>6. Работа над целью</span><input type="checkbox" class="checkbox" id="t6" ${existing && existing.goalCompleted ? 'checked' : ''}></div>
+                <div class="task-item-row"><span>7. Улыбка и позитив</span><input type="checkbox" class="checkbox" id="t7" ${existing && existing.smileCompleted ? 'checked' : ''}></div>
+                <div class="task-item-row"><span>8. Уверенность</span><input type="checkbox" class="checkbox" id="t8" ${existing && existing.confidenceCompleted ? 'checked' : ''}></div>
+                <div class="task-item-row"><span>9. Аффирмации</span><input type="checkbox" class="checkbox" id="t9" ${existing && existing.affirmationCompleted ? 'checked' : ''}></div>
+                <textarea id="t-comm" rows="3" placeholder="Комментарии дня...">${existing ? existing.comments : ''}</textarea>
+                <button class="btn btn-cyan btn-full" style="padding:14px; font-size:15px;" onclick="saveReport()">${existing ? 'СОХРАНИТЬ ИЗМЕНЕНИЯ' : 'ОТПРАВИТЬ ОТЧЕТ'}</button>
+            </div>
+        `;
+    }
+
+    async function saveReport() {
+        const todayStr = new Date().toISOString().split('T')[0];
+        const report = {
+            id: 'rep_' + Math.random().toString(36).substr(2, 8),
+            userId: state.currentUser.id, userName: state.currentUser.name, date: todayStr,
+            physicalExerciseMin: document.getElementById('t1').value,
+            relaxationMin: document.getElementById('t2').value,
+            readingBookDetails: document.getElementById('t3').value,
+            memoryCompleted: document.getElementById('t4').checked,
+            planCompleted: document.getElementById('t5').checked,
+            goalCompleted: document.getElementById('t6').checked,
+            smileCompleted: document.getElementById('t7').checked,
+            confidenceCompleted: document.getElementById('t8').checked,
+            affirmationCompleted: document.getElementById('t9').checked,
+            comments: document.getElementById('t-comm').value
+        };
+        const res = await postAPI({ action: 'add_report', report });
+        if (res.status === 'success') { alert('Отчет сохранен!'); syncAllData(); switchTab('home'); }
+    }
+
+    // ============================================================================
+    // CHAT
+    // ============================================================================
+    function renderChat(c) {
+        let filteredMsgs = state.messages.filter(m => m.messageType === 'CHAT');
+        if (state.chatTab === 'DIRECT_MESSAGES') {
+            filteredMsgs = state.messages.filter(m => m.messageType === 'DIRECT_MESSAGE');
+        }
+
+        c.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h2 style="font-size:22px; font-weight:800;">Чат и Сообщения</h2>
+                <button class="btn btn-surface" onclick="syncAllData()"><i class="fa-solid fa-rotate"></i></button>
+            </div>
+
+            <div class="filter-bar">
+                <div class="filter-chip ${state.chatTab === 'ALL_CHAT' ? 'active' : ''}" onclick="setChatTab('ALL_CHAT')">Общий чат</div>
+                <div class="filter-chip ${state.chatTab === 'DIRECT_MESSAGES' ? 'active' : ''}" onclick="setChatTab('DIRECT_MESSAGES')">Личные</div>
+            </div>
+
+            <div class="chat-container">
+                <div class="chat-messages" id="chat-box">
+                    ${filteredMsgs.map(m => `
+                        <div class="chat-bubble ${m.senderId === state.currentUser.id ? 'chat-mine' : 'chat-other'}">
+                            <div class="chat-sender">${m.senderName}</div>
+                            <div>${m.text.startsWith('[B64]') ? `<img src="data:image/jpeg;base64,${m.text.replace('[B64]','')}" style="max-width:100%; border-radius:12px;">` : m.text}</div>
+                            <div class="chat-time">${m.dateFormatted || ''}</div>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="chat-input-bar">
+                    <input type="file" id="img-input" class="hidden" accept="image/*" onchange="sendImg(event)">
+                    <button class="btn btn-surface" onclick="document.getElementById('img-input').click()"><i class="fa-solid fa-image"></i></button>
+                    <input type="text" id="chat-txt" placeholder="Напишите сообщение...">
+                    <button class="btn btn-cyan" onclick="sendMsg()"><i class="fa-solid fa-paper-plane"></i></button>
+                </div>
+            </div>
+        `;
+        setTimeout(() => { const box = document.getElementById('chat-box'); if (box) box.scrollTop = box.scrollHeight; }, 100);
+    }
+
+    function setChatTab(tab) { state.chatTab = tab; render(); }
+
+    async function sendMsg() {
+        const txt = document.getElementById('chat-txt').value.trim();
+        if (!txt) return;
+        document.getElementById('chat-txt').value = '';
+        const msg = { id: 'msg_' + Date.now(), senderId: state.currentUser.id, senderName: state.currentUser.name, senderRole: state.currentUser.role, messageType: state.chatTab === 'DIRECT_MESSAGES' ? 'DIRECT_MESSAGE' : 'CHAT', text: txt };
+        state.messages.push(msg); render();
+        await postAPI({ action: 'send_message', message: msg });
+        syncAllData();
+    }
+
+    function sendImg(e) {
+        const file = e.target.files[0]; if (!file) return;
+        const reader = new FileReader();
+        reader.onload = async (evt) => {
+            const b64 = evt.target.result.split(',')[1];
+            const msg = { id: 'msg_' + Date.now(), senderId: state.currentUser.id, senderName: state.currentUser.name, senderRole: state.currentUser.role, messageType: state.chatTab === 'DIRECT_MESSAGES' ? 'DIRECT_MESSAGE' : 'CHAT', text: '[B64]' + b64 };
+            state.messages.push(msg); render();
+            await postAPI({ action: 'send_message', message: msg });
+            syncAllData();
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // ============================================================================
+    // RELAXATION
+    // ============================================================================
+    function renderRelaxation(c) {
+        c.innerHTML = `
+            <div class="card" style="text-align:center; padding:30px;">
+                <h3>Аудио и Дыхательные практики</h3>
+                <p style="color:var(--text-muted); margin-top:8px;">10 Звуковых программ и Практика 4-4-4-4</p>
+                <button class="btn btn-cyan" style="margin-top:20px;" onclick="alert('Воспроизведение медитации...')">Запустить аудио</button>
+            </div>
+        `;
+    }
+
+    // ============================================================================
+    // HISTORY WITH PERIOD FILTERS (Неделя, Месяц, Все (Период))
+    // ============================================================================
+    function renderHistory(c) {
+        const isMentor = state.currentUser.role === 'MENTOR';
+
+        let filtered = state.reports;
+        if (!isMentor) {
+            filtered = filtered.filter(r => r.userId === state.currentUser.id);
+        } else if (state.historyStudentFilter) {
+            filtered = filtered.filter(r => r.userId === state.historyStudentFilter);
+        }
+
+        // Apply Time Period Filters
+        const nowTime = new Date().getTime();
+        if (state.historyPeriodFilter === 'WEEK') {
+            const weekAgo = nowTime - (7 * 24 * 60 * 60 * 1000);
+            filtered = filtered.filter(r => new Date(r.date).getTime() >= weekAgo);
+        } else if (state.historyPeriodFilter === 'MONTH') {
+            const monthAgo = nowTime - (30 * 24 * 60 * 60 * 1000);
+            filtered = filtered.filter(r => new Date(r.date).getTime() >= monthAgo);
+        } else if (state.historyPeriodFilter === 'ALL') {
+            if (state.startDate && state.endDate) {
+                filtered = filtered.filter(r => r.date >= state.startDate && r.date <= state.endDate);
+            }
+        }
+
+        let html = `
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h2 style="font-size:22px; font-weight:800;">История отчетов</h2>
+                <button class="btn btn-surface" onclick="syncAllData()"><i class="fa-solid fa-rotate"></i></button>
+            </div>
+        `;
+
+        // Mentor Student Filter Chips
+        if (isMentor) {
+            html += `
+                <div class="filter-bar">
+                    <div class="filter-chip ${state.historyStudentFilter === null ? 'active' : ''}" onclick="setStudentFilter(null)">Все ученики</div>
+                    ${state.users.filter(u=>u.role==='STUDENT').map(u => `
+                        <div class="filter-chip ${state.historyStudentFilter === u.id ? 'active' : ''}" onclick="setStudentFilter('${u.id}')">${u.name.split(' ')[0]}</div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // Period Filters (Неделя, Месяц, Все (Период))
+        html += `
+            <div class="filter-bar" style="margin-top:6px;">
+                <div class="filter-chip ${state.historyPeriodFilter === 'WEEK' ? 'active' : ''}" onclick="setHistoryPeriod('WEEK')">Неделя</div>
+                <div class="filter-chip ${state.historyPeriodFilter === 'MONTH' ? 'active' : ''}" onclick="setHistoryPeriod('MONTH')">Месяц</div>
+                <div class="filter-chip ${state.historyPeriodFilter === 'ALL' ? 'active' : ''}" onclick="setHistoryPeriod('ALL')">Все (Период)</div>
+            </div>
+        `;
+
+        // Date Range Selector if 'ALL' selected
+        if (state.historyPeriodFilter === 'ALL') {
+            html += `
+                <div class="card" style="padding:14px; margin-top:6px;">
+                    <div style="color:var(--text-muted); font-size:12px; margin-bottom:8px;">Выберите период (От — До):</div>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                        <div>
+                            <label style="font-size:11px; color:var(--text-muted);">От:</label>
+                            <input type="date" value="${state.startDate}" onchange="setStartDate(this.value)">
+                        </div>
+                        <div>
+                            <label style="font-size:11px; color:var(--text-muted);">До:</label>
+                            <input type="date" value="${state.endDate}" onchange="setEndDate(this.value)">
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        html += `<div style="display:flex; flex-direction:column; gap:12px; margin-top:10px;">`;
+
+        if (filtered.length === 0) {
+            html += `<div class="card" style="text-align:center; color:var(--text-muted); padding:30px;">Отчетов не найдено<br><span style="font-size:12px;">Попробуйте изменить фильтр или период</span></div>`;
+        } else {
+            filtered.forEach(r => {
+                html += `
+                    <div class="card" style="display:flex; flex-direction:column; gap:10px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <div style="font-weight:700; font-size:16px;">${r.date}</div>
+                                <div style="color:var(--cyan); font-size:13px;">${r.userName}</div>
+                            </div>
+                            <span class="role-tag role-student" style="font-size:12px; padding:6px 10px;">
+                                ${r.completedCoreTasksCount || 0} из 9
+                            </span>
+                        </div>
+                        ${r.comments ? `<div style="color:var(--text-muted); font-size:13px; background:var(--surface-variant); padding:8px 12px; border-radius:10px;">💬 ${r.comments}</div>` : ''}
+                        ${isMentor ? `<div style="text-align:right;"><button class="btn btn-surface" style="color:var(--danger); padding:6px 12px; font-size:12px;" onclick="deleteReport('${r.id}')"><i class="fa-solid fa-trash"></i> Удалить</button></div>` : ''}
+                    </div>
+                `;
+            });
+        }
+
+        html += `</div>`;
+        c.innerHTML = html;
+    }
+
+    function setHistoryPeriod(p) { state.historyPeriodFilter = p; render(); }
+    function setStudentFilter(id) { state.historyStudentFilter = id; render(); }
+    function setStartDate(d) { state.startDate = d; render(); }
+    function setEndDate(d) { state.endDate = d; render(); }
+
+    async function deleteReport(id) {
+        if (!confirm('Удалить этот отчет?')) return;
+        const res = await postAPI({ action: 'delete_report', reportId: id });
+        if (res.status === 'success') {
+            alert('Отчет удален');
+            await syncAllData();
+        }
+    }
+
+    // ============================================================================
+    // PROFILE
+    // ============================================================================
+    function renderProfile(c) {
+        const u = state.currentUser;
+        c.innerHTML = `
+            <h2 style="font-size:22px; font-weight:800;">Профиль пользователя</h2>
+            <div class="card" style="display:flex; flex-direction:column; align-items:center; gap:14px; padding:30px;">
+                <div class="avatar-circle" style="width:80px; height:80px; font-size:36px;">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+                <h3 style="font-size:20px; font-weight:800;">${u.name}</h3>
+                <span class="role-tag ${u.role === 'MENTOR' ? 'role-mentor' : 'role-student'}" style="font-size:13px; padding:6px 14px;">${u.role === 'MENTOR' ? 'Наставник' : 'Ученик'}</span>
+                <p style="color:var(--text-muted); font-size:14px;">Логин: ${u.login}</p>
+                <button class="btn btn-danger btn-full" style="margin-top:20px; padding:14px; font-size:15px;" onclick="logout()">ВЫЙТИ ИЗ АККАУНТА</button>
+            </div>
+        `;
+    }
+
+    // App Initialization
+    if (state.currentUser) syncAllData(); else render();
+</script>
+
+
+</body></html>

@@ -1,0 +1,6 @@
+{
+  "name": "Марафон Успеха — Онлайн Платформа и Аналитика",
+  "description": "Веб-приложение и аналитический дашборд марафона личной эффективности с синхронизацией базы данных Google Sheets.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

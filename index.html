@@ -1,0 +1,2764 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Марафон Успеха — Онлайн Платформа и Аналитика</title>
+    <meta name="description" content="Веб-приложение и аналитический дашборд марафона личной эффективности с синхронизацией базы данных Google Sheets.">
+    <meta property="og:title" content="Марафон Успеха — Онлайн Платформа и Аналитика">
+    <meta property="og:description" content="Веб-приложение и аналитический дашборд марафона личной эффективности с синхронизацией базы данных Google Sheets.">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #0F172A;
+            --surface: #1E293B;
+            --surface-dark: #151E2E;
+            --surface-variant: #334155;
+            --border: #334155;
+            --border-light: #475569;
+            --cyan: #00D2FF;
+            --blue: #3A86FF;
+            --gold: #FFB703;
+            --amber: #FB8500;
+            --emerald: #10B981;
+            --pink: #F72585;
+            --purple: #8338EC;
+            --text-white: #F8FAFC;
+            --text-muted: #94A3B8;
+            --text-dark: #0A1128;
+            --danger: #EF4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-white);
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .tabular-nums {
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Responsive Layout for Mobile & PC Desktop */
+        #app-container {
+            width: 100%;
+            max-width: 1240px;
+            background-color: var(--bg-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            padding-bottom: 85px;
+        }
+
+        /* Top Header */
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 14px 24px;
+            background-color: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(8px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .user-badge {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        .avatar-circle {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            background: linear-gradient(135deg, rgba(0,210,255,0.3), var(--surface-variant));
+            border: 2px solid var(--cyan);
+            color: var(--cyan);
+            flex-shrink: 0;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 800;
+            font-size: 15px;
+            color: var(--text-white);
+        }
+
+        .role-tag {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-top: 2px;
+        }
+
+        .role-mentor {
+            background: rgba(255, 183, 3, 0.18);
+            color: var(--gold);
+        }
+
+        .role-student {
+            background: rgba(0, 210, 255, 0.18);
+            color: var(--cyan);
+        }
+
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .notification-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background-color: var(--surface);
+            border: 1px solid var(--border-light);
+            padding: 8px 14px;
+            border-radius: 12px;
+            cursor: pointer;
+            color: var(--cyan);
+            font-weight: 700;
+            font-size: 13px;
+            transition: 0.2s;
+            white-space: nowrap;
+        }
+
+        .notification-btn:hover {
+            border-color: var(--cyan);
+        }
+
+        /* Bottom Navigation Bar */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 1240px;
+            height: 65px;
+            background-color: var(--surface);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid var(--border-light);
+            z-index: 1000;
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.45);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 11px;
+            transition: 0.2s;
+            flex: 1;
+            padding: 8px 0;
+            user-select: none;
+        }
+
+        .nav-item i {
+            font-size: 18px;
+        }
+
+        .nav-item.active {
+            color: var(--cyan);
+            font-weight: 700;
+        }
+
+        /* Main Content Area */
+        .content {
+            padding: 20px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        @media (max-width: 640px) {
+            .content { padding: 14px 14px; gap: 14px; }
+            .top-bar { padding: 12px 14px; }
+        }
+
+        /* Responsive Grids */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 14px;
+        }
+
+        @media (min-width: 640px) {
+            .grid-2 { grid-template-columns: 1fr 1fr; }
+            .grid-4 { grid-template-columns: 1fr 1fr; }
+        }
+
+        @media (min-width: 960px) {
+            .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+            .grid-4 { grid-template-columns: repeat(4, 1fr); }
+            .analytics-charts-grid {
+                display: grid;
+                grid-template-columns: 7fr 5fr;
+                gap: 18px;
+                align-items: stretch;
+            }
+        }
+
+        /* Cards & Buttons */
+        .card {
+            background-color: var(--surface);
+            border-radius: 18px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            transition: 0.2s;
+        }
+
+        .card-gold {
+            background: linear-gradient(135deg, rgba(38,25,4,1) 0%, var(--surface) 100%);
+            border-color: rgba(255, 183, 3, 0.65);
+        }
+
+        .btn {
+            padding: 10px 16px;
+            border-radius: 12px;
+            border: 1px solid transparent;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: 0.18s;
+            white-space: nowrap;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-cyan { background-color: var(--cyan); color: var(--text-dark); }
+        .btn-cyan:hover { filter: brightness(1.08); }
+        .btn-gold { background-color: var(--gold); color: var(--text-dark); }
+        .btn-emerald { background-color: rgba(16, 185, 129, 0.18); color: var(--emerald); border-color: rgba(16, 185, 129, 0.4); }
+        .btn-emerald:hover { background-color: rgba(16, 185, 129, 0.28); }
+        .btn-surface { background-color: var(--surface-variant); color: var(--text-white); border-color: var(--border-light); }
+        .btn-surface:hover { border-color: var(--cyan); }
+        .btn-danger { background-color: var(--danger); color: var(--text-white); }
+        .btn-sm { padding: 6px 11px; font-size: 12px; border-radius: 9px; }
+        .btn-full { width: 100%; }
+
+        /* Donut Chart */
+        .donut-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .donut-svg-wrap {
+            position: relative;
+            width: 170px;
+            height: 170px;
+        }
+
+        .donut-svg {
+            transform: rotate(-90deg);
+            width: 100%;
+            height: 100%;
+        }
+
+        .donut-center {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .donut-percent {
+            font-size: 28px;
+            font-weight: 800;
+        }
+
+        .donut-label {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* Quick Actions Grid */
+        .quick-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        @media (min-width: 768px) {
+            .quick-grid { grid-template-columns: repeat(4, 1fr); }
+        }
+
+        .quick-card {
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: 0.2s;
+        }
+
+        .quick-card:hover {
+            border-color: var(--cyan);
+            transform: translateY(-2px);
+        }
+
+        .quick-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        /* Forms & Inputs */
+        .task-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .task-item-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: var(--surface);
+            padding: 14px 16px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+        }
+
+        .checkbox {
+            width: 22px;
+            height: 22px;
+            accent-color: var(--cyan);
+            cursor: pointer;
+        }
+
+        input[type="text"], input[type="password"], input[type="number"], input[type="date"], textarea, select {
+            width: 100%;
+            padding: 11px 14px;
+            background-color: var(--surface-variant);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            color: var(--text-white);
+            font-size: 13px;
+            outline: none;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            border-color: var(--cyan);
+        }
+
+        /* Filter Chips Bar */
+        .filter-bar {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            white-space: nowrap;
+            align-items: center;
+        }
+
+        .filter-chip {
+            padding: 8px 15px;
+            border-radius: 11px;
+            background-color: var(--surface-dark);
+            border: 1px solid var(--border-light);
+            color: var(--text-white);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.18s;
+            user-select: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .filter-chip:hover {
+            border-color: var(--cyan);
+        }
+
+        .filter-chip.active {
+            background-color: var(--cyan);
+            border-color: var(--cyan);
+            color: var(--text-dark);
+            font-weight: 800;
+        }
+
+        /* Data Table Styles for Analytics Dashboard */
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            background-color: var(--surface-dark);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            text-align: left;
+        }
+
+        .data-table th {
+            background-color: rgba(15, 23, 42, 0.9);
+            color: var(--text-muted);
+            font-weight: 700;
+            padding: 12px 10px;
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+            user-select: none;
+        }
+
+        .data-table th.sortable {
+            cursor: pointer;
+        }
+
+        .data-table th.sortable:hover {
+            color: var(--cyan);
+        }
+
+        .data-table td {
+            padding: 11px 10px;
+            border-bottom: 1px solid rgba(51, 65, 85, 0.55);
+            vertical-align: middle;
+        }
+
+        .data-table tbody tr:hover {
+            background-color: rgba(51, 65, 85, 0.35);
+        }
+
+        .data-table tfoot td {
+            background-color: rgba(15, 23, 42, 0.95);
+            font-weight: 800;
+            padding: 12px 10px;
+            border-top: 2px solid var(--border-light);
+        }
+
+        .badge-yes {
+            color: var(--emerald);
+            font-weight: 800;
+        }
+
+        .badge-no {
+            color: #64748B;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 8px;
+            background-color: #0F172A;
+            border-radius: 99px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 99px;
+            transition: width 0.3s ease;
+        }
+
+        /* Chat UI */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 230px);
+            min-height: 440px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 14px;
+            background-color: rgba(15, 23, 42, 0.5);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+        }
+
+        .chat-bubble {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 16px;
+            font-size: 14px;
+            line-height: 1.45;
+            word-break: break-word;
+        }
+
+        .chat-mine {
+            align-self: flex-end;
+            background-color: rgba(0, 210, 255, 0.18);
+            border: 1px solid rgba(0, 210, 255, 0.45);
+            border-bottom-right-radius: 4px;
+        }
+
+        .chat-other {
+            align-self: flex-start;
+            background-color: var(--surface);
+            border: 1px solid var(--border-light);
+            border-bottom-left-radius: 4px;
+        }
+
+        .chat-broadcast {
+            align-self: center;
+            width: 100%;
+            max-width: 100%;
+            background-color: rgba(255, 183, 3, 0.12);
+            border: 1px solid rgba(255, 183, 3, 0.45);
+        }
+
+        .chat-sender {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--cyan);
+            margin-bottom: 4px;
+        }
+
+        .chat-time {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 4px;
+            text-align: right;
+        }
+
+        .chat-input-bar {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            padding-top: 12px;
+        }
+
+        /* Modals & Toast */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.78);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background-color: var(--surface);
+            border-radius: 20px;
+            padding: 24px;
+            width: 100%;
+            max-width: 540px;
+            border: 1px solid var(--border-light);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .toast-box {
+            position: fixed;
+            top: 18px;
+            right: 18px;
+            z-index: 4000;
+            background-color: #064E3B;
+            border: 1px solid var(--emerald);
+            color: #F8FAFC;
+            padding: 12px 18px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            transition: 0.25s;
+        }
+
+        /* Login Screen */
+        .login-screen {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background-color: var(--bg-dark);
+            z-index: 3000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .login-card {
+            background-color: var(--surface);
+            border-radius: 24px;
+            padding: 32px;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid var(--border-light);
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        /* Breathing Circle */
+        .breath-circle {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            border: 4px solid var(--cyan);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 16px auto;
+            transition: transform 0.8s ease, border-color 0.4s ease;
+            background: rgba(15, 23, 42, 0.7);
+        }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+<div id="toast-container" class="toast-box hidden"></div>
+
+<div id="app-container">
+    <!-- Top Header Bar -->
+    <div class="top-bar">
+        <div class="user-badge" onclick="switchTab('profile')">
+            <div class="avatar-circle" id="top-avatar">
+                <i class="fa-solid fa-user"></i>
+            </div>
+            <div class="user-info">
+                <span class="user-name" id="top-user-name">Загрузка...</span>
+                <div>
+                    <span class="role-tag role-mentor" id="top-user-role">Роль</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="top-actions">
+            <button class="notification-btn" onclick="syncAllData(true)" title="Быстрая синхронизация с Google Sheets">
+                <i class="fa-solid fa-rotate" id="sync-icon"></i>
+                <span id="sync-latency-label" class="tabular-nums" style="font-size:11px; color:var(--text-muted);">БД</span>
+            </button>
+            <div class="notification-btn" onclick="switchTab('history')" title="Перейти к истории отчетов">
+                <i class="fa-solid fa-bell"></i>
+                <span id="top-notification-count" class="tabular-nums">0</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Body -->
+    <div class="content" id="main-content"></div>
+
+    <!-- Bottom Navigation Bar -->
+    <div class="bottom-nav" id="bottom-nav"></div>
+</div>
+
+<!-- Login Screen -->
+<div class="login-screen hidden" id="login-screen">
+    <div class="login-card">
+        <div style="text-align: center;">
+            <i class="fa-solid fa-trophy" style="font-size: 48px; color: var(--gold); margin-bottom: 12px;"></i>
+            <h2 style="font-size: 24px; font-weight: 800;">Марафон Успеха</h2>
+            <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">Онлайн база данных Google Sheets</p>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 10px;">
+            <div>
+                <label style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px; display: block;">Логин</label>
+                <input type="text" id="login-username" placeholder="Введите ваш логин" onkeydown="if(event.key==='Enter') handleLogin()">
+            </div>
+            <div>
+                <label style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px; display: block;">Пароль</label>
+                <input type="password" id="login-password" placeholder="Введите пароль" onkeydown="if(event.key==='Enter') handleLogin()">
+            </div>
+            <button class="btn btn-cyan btn-full" style="padding: 14px; font-size: 15px; margin-top: 6px;" onclick="handleLogin()" id="login-btn">Войти в марафон</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Container -->
+<div class="modal-overlay hidden" id="modal-container" onclick="if(event.target===this) closeModal()">
+    <div class="modal-content" id="modal-body"></div>
+</div>
+
+<script>
+    // ============================================================================
+    // КОНФИГУРАЦИЯ БАЗЫ ДАННЫХ GOOGLE APPS SCRIPT
+    // ============================================================================
+    const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbxH_ahjT5hIPL9QwYAM5m1XKSy25nAkq44A7uxB6BpeojePRXVjGdln-qFHtRqgXErK/exec";
+
+    // Исправленный массив месяцев (устраняет критический баг ReferenceError: monthsRu is not defined)
+    const monthsRu = ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'];
+
+    const TASK_NAMES = {
+        ALL: 'Общий прогресс (9 задач)',
+        t1: '1. Физ. нагрузки (мин)',
+        t2: '2. Расслабление (мин)',
+        t3: '3. Чтение книги',
+        t4: '4. Хотира (память)',
+        t5: '5. План на день',
+        t6: '6. Работа над целью',
+        t7: '7. Улыбка',
+        t8: '8. Уверенность',
+        t9: '9. Аффирмации'
+    };
+
+    // Точное локальное время YYYY-MM-DD (без сдвига часового пояса UTC)
+    function getLocalTodayStr(d = new Date()) {
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+    }
+
+    function normalizeDateStr(raw) {
+        if (!raw) return getLocalTodayStr();
+        const s = String(raw).trim();
+        if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+        if (/^\d{4}-\d{2}-\d{2}T/.test(s)) {
+            const dt = new Date(s);
+            return isNaN(dt.getTime()) ? s.slice(0, 10) : getLocalTodayStr(dt);
+        }
+        const dmy = s.match(/^(\d{2})\.(\d{2})\.(\d{4})/);
+        if (dmy) return `${dmy[3]}-${dmy[2]}-${dmy[1]}`;
+        const parsed = new Date(s);
+        return isNaN(parsed.getTime()) ? s : getLocalTodayStr(parsed);
+    }
+
+    function parseMinutes(val) {
+        if (typeof val === 'number') return isNaN(val) ? 0 : Math.max(0, Math.round(val));
+        if (!val) return 0;
+        const m = String(val).replace(',', '.').match(/(\d+(\.\d+)?)/);
+        return m ? Math.max(0, Math.round(parseFloat(m[1]))) : 0;
+    }
+
+    function isTaskDone(rep, key) {
+        if (!rep) return false;
+        if (key === 't1') return parseMinutes(rep.physicalExerciseMin) > 0;
+        if (key === 't2') return parseMinutes(rep.relaxationMin) > 0;
+        if (key === 't3') {
+            const b = String(rep.readingBookDetails || '').trim();
+            return b.length > 0 && b !== '0' && b.toLowerCase() !== 'нет' && b !== '-';
+        }
+        if (key === 't4') return Boolean(rep.memoryCompleted);
+        if (key === 't5') return Boolean(rep.planCompleted);
+        if (key === 't6') return Boolean(rep.goalCompleted);
+        if (key === 't7') return Boolean(rep.smileCompleted);
+        if (key === 't8') return Boolean(rep.confidenceCompleted);
+        if (key === 't9') return Boolean(rep.affirmationCompleted);
+        return false;
+    }
+
+    // Автоматический подсчет выполненных задач из 9 (исправляет баг 0/9 при отправке отчета)
+    function computeCompletedTasksCount(rep) {
+        let count = 0;
+        ['t1','t2','t3','t4','t5','t6','t7','t8','t9'].forEach(k => {
+            if (isTaskDone(rep, k)) count++;
+        });
+        return count;
+    }
+
+    function normalizeReport(r) {
+        const norm = {
+            id: String(r.id || ''),
+            date: normalizeDateStr(r.date),
+            time: String(r.time || ''),
+            userId: String(r.userId || ''),
+            userName: String(r.userName || 'Ученик'),
+            physicalExerciseMin: String(r.physicalExerciseMin ?? '0').trim() || '0',
+            relaxationMin: String(r.relaxationMin ?? '0').trim() || '0',
+            readingBookDetails: String(r.readingBookDetails ?? '').trim(),
+            memoryCompleted: r.memoryCompleted === true || String(r.memoryCompleted).toUpperCase() === 'ДА',
+            planCompleted: r.planCompleted === true || String(r.planCompleted).toUpperCase() === 'ДА',
+            goalCompleted: r.goalCompleted === true || String(r.goalCompleted).toUpperCase() === 'ДА',
+            smileCompleted: r.smileCompleted === true || String(r.smileCompleted).toUpperCase() === 'ДА',
+            confidenceCompleted: r.confidenceCompleted === true || String(r.confidenceCompleted).toUpperCase() === 'ДА',
+            affirmationCompleted: r.affirmationCompleted === true || String(r.affirmationCompleted).toUpperCase() === 'ДА',
+            comments: String(r.comments ?? '').trim()
+        };
+        const calc = computeCompletedTasksCount(norm);
+        const rawCount = Number(r.completedCoreTasksCount || 0);
+        norm.completedCoreTasksCount = calc > 0 ? calc : Math.min(9, Math.max(0, rawCount));
+        return norm;
+    }
+
+    // ============================================================================
+    // ГЛОБАЛЬНОЕ СОСТОЯНИЕ ПРИЛОЖЕНИЯ (STATE)
+    // ============================================================================
+    const savedCache = JSON.parse(localStorage.getItem('marathon_cache_v3') || 'null');
+
+    let state = {
+        currentUser: JSON.parse(localStorage.getItem('web_user') || 'null'),
+        activeTab: 'home',
+        users: (savedCache && savedCache.users) || [],
+        reports: ((savedCache && savedCache.reports) || []).map(normalizeReport),
+        quotes: (savedCache && savedCache.quotes) || [],
+        messages: (savedCache && savedCache.messages) || [],
+        isSyncing: false,
+        lastSyncLatencyMs: 0,
+
+        // Фильтры Дашборда Аналитики (Только для Наставника)
+        analyticsStudentFilter: 'ALL', // 'ALL' или ID конкретного ученика
+        analyticsTaskFilter: 'ALL',    // 'ALL', 't1'..'t9'
+        analyticsPeriodFilter: 'MONTH', // 'TODAY', 'WEEK', 'DAYS_14', 'MONTH', 'ALL', 'CUSTOM'
+        analyticsStartDate: (() => { const d = new Date(); d.setDate(d.getDate() - 29); return getLocalTodayStr(d); })(),
+        analyticsEndDate: getLocalTodayStr(),
+        analyticsLevelFilter: 'ALL',   // 'ALL', 'HIGH' (8-9), 'MEDIUM' (5-7), 'LOW' (0-4)
+        analyticsTodayStatus: 'ALL',   // 'ALL', 'SUBMITTED', 'MISSING'
+        analyticsSearchQuery: '',
+        analyticsTableMode: 'REPORTS_TABLE', // 'REPORTS_TABLE', 'DAILY_MATRIX', 'STUDENTS_RANKING'
+        analyticsSortField: 'date',
+        analyticsSortDir: 'desc',
+        analyticsSelectedPointIdx: null,
+
+        // Задания дня
+        taskSelectedDate: getLocalTodayStr(),
+
+        // Чат
+        chatTab: 'ALL_CHAT', // 'ALL_CHAT', 'DIRECT_MESSAGES', 'BROADCASTS'
+        chatRecipientId: '',
+
+        // Расслабление (Web Audio API & Дыхание 4-4-4-4)
+        relaxationTab: 'AUDIO',
+        activeAudioId: null,
+        breathingActive: false,
+
+        // История отчетов
+        historyPeriodFilter: 'ALL', // 'WEEK', 'MONTH', 'ALL'
+        historyStudentFilter: null,
+        startDate: '2024-01-01',
+        endDate: getLocalTodayStr(),
+
+        // Мотивация Наставника
+        mentorQuoteDay: new Date().getDate()
+    };
+
+    // Уведомления без блокировки экрана
+    function showToast(msg, isError = false) {
+        const el = document.getElementById('toast-container');
+        if (!el) return;
+        el.innerText = msg;
+        el.style.backgroundColor = isError ? '#7F1D1D' : '#064E3B';
+        el.style.borderColor = isError ? '#EF4444' : '#10B981';
+        el.classList.remove('hidden');
+        clearTimeout(window._toastTimer);
+        window._toastTimer = setTimeout(() => {
+            el.classList.add('hidden');
+        }, 3200);
+    }
+
+    function escapeHtml(str) {
+        return String(str ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    // ============================================================================
+    // БЫСТРЫЕ ЗАПРОСЫ К СЕРВЕРУ (КЭШ-ПРОКСИ + ПРЯМОЙ GOOGLE APPS SCRIPT FALLBACK)
+    // ============================================================================
+    async function postAPI(data) {
+        // 1. Попытка через быстрый серверный прокси (если запущен на сервере)
+        if (location.protocol.startsWith('http')) {
+            try {
+                const proxyRes = await fetch('/api/gas', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                if (proxyRes.ok) return await proxyRes.json();
+            } catch (_) {}
+        }
+
+        // 2. Прямой запрос к Google Apps Script (работает и локально из файла index.html)
+        try {
+            const res = await fetch(WEBHOOK_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(data)
+            });
+            return await res.json();
+        } catch (e) {
+            console.error('API POST Error:', e);
+            return { status: 'error', message: e.message };
+        }
+    }
+
+    async function getAPI(action, params = {}) {
+        let url = `${WEBHOOK_URL}?action=${action}`;
+        for (let k in params) {
+            if (params[k]) url += `&${k}=${encodeURIComponent(params[k])}`;
+        }
+        try {
+            const res = await fetch(url);
+            return await res.json();
+        } catch (e) {
+            console.error('API GET Error:', e);
+            return { status: 'error', message: e.message };
+        }
+    }
+
+    // ============================================================================
+    // СИНХРОНИЗАЦИЯ ДАННЫХ С КЭШИРОВАНИЕМ
+    // ============================================================================
+    async function syncAllData(force = false) {
+        if (!state.currentUser || state.isSyncing) return;
+        state.isSyncing = true;
+        const syncIcon = document.getElementById('sync-icon');
+        if (syncIcon) syncIcon.classList.add('fa-spin');
+
+        const startT = performance.now();
+        let syncedViaProxy = false;
+
+        if (location.protocol.startsWith('http')) {
+            try {
+                const q = `?userId=${encodeURIComponent(state.currentUser.id)}${force ? '&force=true' : ''}`;
+                const res = await fetch('/api/sync' + q);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.status === 'success') {
+                        state.users = data.users || [];
+                        state.reports = (data.reports || []).map(normalizeReport);
+                        state.quotes = data.quotes || [];
+                        state.messages = data.messages || [];
+                        syncedViaProxy = true;
+                    }
+                }
+            } catch (_) {}
+        }
+
+        if (!syncedViaProxy) {
+            const [usersRes, reportsRes, quotesRes, msgsRes] = await Promise.all([
+                getAPI('get_users'),
+                getAPI('get_reports'),
+                getAPI('get_quotes'),
+                getAPI('get_messages', { userId: state.currentUser.id })
+            ]);
+
+            if (usersRes.users) state.users = usersRes.users;
+            if (reportsRes.reports) state.reports = reportsRes.reports.map(normalizeReport);
+            if (quotesRes.quotes) state.quotes = quotesRes.quotes;
+            if (msgsRes.messages) state.messages = msgsRes.messages;
+        }
+
+        state.lastSyncLatencyMs = Math.round(performance.now() - startT);
+        state.isSyncing = false;
+        if (syncIcon) syncIcon.classList.remove('fa-spin');
+
+        const latLabel = document.getElementById('sync-latency-label');
+        if (latLabel) latLabel.innerText = `${state.lastSyncLatencyMs}мс`;
+
+        // Обновляем данные текущего пользователя
+        const updatedMe = state.users.find(u => u.id === state.currentUser.id);
+        if (updatedMe) {
+            state.currentUser = updatedMe;
+            localStorage.setItem('web_user', JSON.stringify(updatedMe));
+        }
+
+        // Сохраняем в локальный кэш для мгновенного открытия
+        try {
+            localStorage.setItem('marathon_cache_v3', JSON.stringify({
+                users: state.users,
+                reports: state.reports,
+                quotes: state.quotes,
+                messages: state.messages
+            }));
+        } catch (_) {}
+
+        updateNotificationBadge();
+        render();
+    }
+
+    function updateNotificationBadge() {
+        if (!state.currentUser) return;
+        const isMentor = state.currentUser.role === 'MENTOR';
+        const myReportsCount = isMentor
+            ? state.reports.length
+            : state.reports.filter(r => r.userId === state.currentUser.id).length;
+        const badge = document.getElementById('top-notification-count');
+        if (badge) badge.innerText = myReportsCount + state.messages.length;
+    }
+
+    // ============================================================================
+    // АВТОРИЗАЦИЯ
+    // ============================================================================
+    async function handleLogin() {
+        const loginInput = document.getElementById('login-username').value.trim();
+        const passInput = document.getElementById('login-password').value.trim();
+
+        if (!loginInput || !passInput) {
+            showToast('Пожалуйста, введите логин и пароль', true);
+            return;
+        }
+
+        const btn = document.getElementById('login-btn');
+        btn.innerText = 'Вход в систему...';
+        btn.disabled = true;
+
+        const res = await postAPI({ action: 'login', login: loginInput, password: passInput });
+        btn.innerText = 'Войти в марафон';
+        btn.disabled = false;
+
+        if (res.status === 'success' && res.user) {
+            state.currentUser = res.user;
+            state.activeTab = 'home';
+            localStorage.setItem('web_user', JSON.stringify(res.user));
+            document.getElementById('login-screen').classList.add('hidden');
+            showToast(`Добро пожаловать, ${res.user.name}!`);
+            render();
+            await syncAllData(true);
+        } else {
+            showToast(res.message || 'Ошибка входа: проверьте логин и пароль', true);
+        }
+    }
+
+    function logout() {
+        stopRelaxAudio();
+        state.currentUser = null;
+        state.activeTab = 'home';
+        localStorage.removeItem('web_user');
+        render();
+    }
+
+    // ============================================================================
+    // НАВИГАЦИЯ И КОНТРОЛЬ ДОСТУПА (ТОЛЬКО НАСТАВНИК ИМЕЕТ ДОСТУП К АНАЛИТИКЕ)
+    // ============================================================================
+    function switchTab(tab) {
+        const isMentor = state.currentUser && state.currentUser.role === 'MENTOR';
+        // Строгая защита: ученики не имеют доступа к Аналитике и Панели Наставника
+        if (!isMentor && (tab === 'analytics' || tab === 'mentor')) {
+            state.activeTab = 'history';
+        } else {
+            state.activeTab = tab;
+        }
+        render();
+    }
+
+    function renderNav() {
+        const isMentor = state.currentUser && state.currentUser.role === 'MENTOR';
+
+        // Ученикам недоступна вкладка Аналитика — только их задания и история отчетов
+        const items = isMentor ? [
+            { tab: 'home', title: 'Главная', icon: 'fa-home' },
+            { tab: 'mentor', title: 'Ученики', icon: 'fa-users' },
+            { tab: 'analytics', title: 'Аналитика', icon: 'fa-chart-column' },
+            { tab: 'chat', title: 'Чат', icon: 'fa-comments' },
+            { tab: 'history', title: 'История', icon: 'fa-clock-rotate-left' }
+        ] : [
+            { tab: 'home', title: 'Главная', icon: 'fa-home' },
+            { tab: 'tasks', title: 'Задания', icon: 'fa-list-check' },
+            { tab: 'chat', title: 'Чат', icon: 'fa-comments' },
+            { tab: 'relaxation', title: 'Расслабление', icon: 'fa-spa' },
+            { tab: 'history', title: 'История', icon: 'fa-clock-rotate-left' }
+        ];
+
+        document.getElementById('bottom-nav').innerHTML = items.map(i => `
+            <div class="nav-item ${state.activeTab === i.tab ? 'active' : ''}" onclick="switchTab('${i.tab}')">
+                <i class="fa-solid ${i.icon}"></i>
+                <span>${i.title}</span>
+            </div>
+        `).join('');
+    }
+
+    function renderTopBar() {
+        if (!state.currentUser) return;
+        document.getElementById('top-user-name').innerText = state.currentUser.name;
+        const tag = document.getElementById('top-user-role');
+        if (state.currentUser.role === 'MENTOR') {
+            tag.innerText = 'Наставник';
+            tag.className = 'role-tag role-mentor';
+        } else {
+            tag.innerText = `Ученик • 🔥 ${state.currentUser.streakDays || 0} дн.`;
+            tag.className = 'role-tag role-student';
+        }
+        updateNotificationBadge();
+    }
+
+    function render() {
+        if (!state.currentUser) {
+            document.getElementById('login-screen').classList.remove('hidden');
+            return;
+        }
+        document.getElementById('login-screen').classList.add('hidden');
+
+        const isMentor = state.currentUser.role === 'MENTOR';
+        if (!isMentor && (state.activeTab === 'analytics' || state.activeTab === 'mentor')) {
+            state.activeTab = 'home';
+        }
+
+        renderTopBar();
+        renderNav();
+
+        const c = document.getElementById('main-content');
+        c.innerHTML = '';
+
+        if (state.activeTab === 'home') renderHome(c);
+        else if (state.activeTab === 'mentor' && isMentor) renderMentor(c);
+        else if (state.activeTab === 'analytics' && isMentor) renderAnalytics(c);
+        else if (state.activeTab === 'tasks') renderTasks(c);
+        else if (state.activeTab === 'chat') renderChat(c);
+        else if (state.activeTab === 'relaxation') renderRelaxation(c);
+        else if (state.activeTab === 'history') renderHistory(c);
+        else if (state.activeTab === 'profile') renderProfile(c);
+    }
+
+    // ============================================================================
+    // 1. ГЛАВНАЯ СТРАНИЦА (HOME)
+    // ============================================================================
+    function renderHome(c) {
+        const isMentor = state.currentUser.role === 'MENTOR';
+        const day = new Date().getDate();
+        const quote = state.quotes.find(q => Number(q.dayOfMonth) === day) || {
+            text: 'НЕ НАЗЫВАЙ КОНЦОМ ТО, ЧТО МОЖЕТ ОКАЗАТЬСЯ НОВОЙ ГЛАВОЙ. Если ты сейчас в трудном периоде — продолжай путь.',
+            author: 'Марафон Успеха'
+        };
+        const todayStr = getLocalTodayStr();
+        const todayRep = state.reports.find(r => r.userId === state.currentUser.id && r.date === todayStr);
+        const studentsCount = state.users.filter(u => u.role === 'STUDENT').length;
+
+        let completed = isMentor ? state.reports.length : (todayRep ? todayRep.completedCoreTasksCount : 0);
+        let percent = isMentor ? 100 : Math.round((completed / 9) * 100);
+
+        let html = `
+            <!-- Карточка Мотивации Дня -->
+            <div class="card card-gold">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="color:var(--gold); font-weight:700;"><i class="fa-solid fa-lightbulb"></i> Мотивация дня</span>
+                    <span style="color:var(--text-muted); font-size:11px;">День ${day} из 30</span>
+                </div>
+                <p style="font-size:15px; margin-top:10px; font-weight:500; line-height:1.5;">«${escapeHtml(quote.text)}»</p>
+                <p style="font-size:12px; color:var(--text-muted); text-align:right; margin-top:4px;">— ${escapeHtml(quote.author)}</p>
+            </div>
+
+            <!-- Кольцевая диаграмма прогресса -->
+            <div class="card donut-container">
+                <div style="width:100%; display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <div style="font-weight:700; font-size:16px;">${isMentor ? 'Отчеты учеников марафона' : 'Выполнение 9 заданий дня'}</div>
+                        <div style="color:var(--text-muted); font-size:12px;">${isMentor ? `Всего учеников: ${studentsCount}` : (todayRep ? `Дата: ${todayRep.date}` : 'Отчет за сегодня еще не отправлен')}</div>
+                    </div>
+                    <span class="role-tag role-student tabular-nums" style="font-size:12px;">${completed} ${isMentor ? 'отчетов' : 'из 9'}</span>
+                </div>
+                <div class="donut-svg-wrap">
+                    <svg class="donut-svg" viewBox="0 0 36 36">
+                        <path stroke="var(--border)" stroke-width="3.8" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <path stroke="var(--cyan)" stroke-width="3.8" stroke-dasharray="${percent}, 100" stroke-linecap="round" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    </svg>
+                    <div class="donut-center">
+                        <div class="donut-percent tabular-nums">${isMentor ? completed : percent + '%'}</div>
+                        <div class="donut-label">${isMentor ? 'Всего отчетов' : 'Прогресс'}</div>
+                    </div>
+                </div>
+                ${isMentor ? `
+                    <button class="btn btn-cyan" onclick="switchTab('analytics')"><i class="fa-solid fa-chart-line"></i> Открыть Дашборд Аналитики</button>
+                ` : `
+                    <button class="btn btn-cyan" onclick="switchTab('tasks')"><i class="fa-solid fa-list-check"></i> ${todayRep ? 'Изменить отчет за сегодня' : 'Заполнить отчет за сегодня'}</button>
+                `}
+            </div>
+        `;
+
+        if (!isMentor) {
+            html += `
+                <div>
+                    <div style="font-weight:700; font-size:16px; margin-bottom:12px;">Быстрые действия</div>
+                    <div class="quick-grid">
+                        <div class="quick-card" onclick="switchTab('tasks')">
+                            <div class="quick-icon" style="background:rgba(255,183,3,0.2); color:var(--gold);"><i class="fa-solid fa-list-check"></i></div>
+                            <div style="font-weight:700;">Задание дня</div>
+                        </div>
+                        <div class="quick-card" onclick="switchTab('history')">
+                            <div class="quick-icon" style="background:rgba(0,210,255,0.2); color:var(--cyan);"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                            <div style="font-weight:700;">Мои отчеты</div>
+                        </div>
+                        <div class="quick-card" onclick="switchTab('chat')">
+                            <div class="quick-icon" style="background:rgba(16,185,129,0.2); color:var(--emerald);"><i class="fa-solid fa-comments"></i></div>
+                            <div style="font-weight:700;">Чат</div>
+                        </div>
+                        <div class="quick-card" onclick="switchTab('relaxation')">
+                            <div class="quick-icon" style="background:rgba(131,56,236,0.2); color:var(--purple);"><i class="fa-solid fa-spa"></i></div>
+                            <div style="font-weight:700;">Расслабление</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        } else {
+            html += `
+                <div>
+                    <div style="font-weight:700; font-size:16px; margin-bottom:12px;">Быстрые действия Наставника</div>
+                    <div class="quick-grid">
+                        <div class="quick-card" onclick="switchTab('analytics')">
+                            <div class="quick-icon" style="background:rgba(0,210,255,0.2); color:var(--cyan);"><i class="fa-solid fa-chart-column"></i></div>
+                            <div style="font-weight:700;">Аналитика и БД</div>
+                        </div>
+                        <div class="quick-card" onclick="switchTab('mentor')">
+                            <div class="quick-icon" style="background:rgba(255,183,3,0.2); color:var(--gold);"><i class="fa-solid fa-users"></i></div>
+                            <div style="font-weight:700;">Ученики (${studentsCount})</div>
+                        </div>
+                        <div class="quick-card" onclick="switchTab('chat')">
+                            <div class="quick-icon" style="background:rgba(16,185,129,0.2); color:var(--emerald);"><i class="fa-solid fa-comments"></i></div>
+                            <div style="font-weight:700;">Чат и Рассылка</div>
+                        </div>
+                        <div class="quick-card" onclick="switchTab('history')">
+                            <div class="quick-icon" style="background:rgba(131,56,236,0.2); color:var(--purple);"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                            <div style="font-weight:700;">Все отчеты</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        c.innerHTML = html;
+    }
+
+    // ============================================================================
+    // 2. ПАНЕЛЬ НАСТАВНИКА (УЧЕНИКИ И МОТИВАЦИЯ)
+    // ============================================================================
+    function renderMentor(c) {
+        const students = state.users.filter(u => u.role === 'STUDENT');
+        const todayStr = getLocalTodayStr();
+        const submittedToday = students.filter(s => state.reports.some(r => r.userId === s.id && r.date === todayStr)).length;
+        const currentQuoteObj = state.quotes.find(q => Number(q.dayOfMonth) === Number(state.mentorQuoteDay));
+
+        let html = `
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h2 style="font-size:22px; font-weight:800;">Панель Наставника</h2>
+                <button class="btn btn-surface" onclick="syncAllData(true)"><i class="fa-solid fa-rotate"></i> Обновить</button>
+            </div>
+
+            <div class="grid-2">
+                <div class="card">
+                    <div style="color:var(--text-muted); font-size:12px;">Всего учеников в базе</div>
+                    <div class="tabular-nums" style="font-size:28px; font-weight:800; margin-top:4px;">${students.length}</div>
+                </div>
+                <div class="card">
+                    <div style="color:var(--text-muted); font-size:12px;">Сдали отчет сегодня (${todayStr})</div>
+                    <div class="tabular-nums" style="font-size:28px; font-weight:800; color:var(--emerald); margin-top:4px;">${submittedToday} / ${students.length}</div>
+                </div>
+            </div>
+
+            <div class="card card-gold">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
+                    <div style="font-weight:700; color:var(--gold); font-size:16px;"><i class="fa-solid fa-bullhorn"></i> Мотивация дня</div>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <span style="font-size:12px; color:var(--text-muted);">День месяца:</span>
+                        <select style="width:auto; padding:6px 10px;" onchange="state.mentorQuoteDay=Number(this.value); render();">
+                            ${Array.from({length: 30}, (_, i) => i + 1).map(d => `
+                                <option value="${d}" ${Number(state.mentorQuoteDay) === d ? 'selected' : ''}>День ${d}</option>
+                            `).join('')}
+                        </select>
+                    </div>
+                </div>
+                <textarea id="mentor-mot-input" rows="3" placeholder="Введите текст мотивации...">${currentQuoteObj ? escapeHtml(currentQuoteObj.text) : ''}</textarea>
+                <button class="btn btn-gold btn-full" style="margin-top:10px; font-size:14px;" onclick="saveMotivation()">ОБНОВИТЬ МОТИВАЦИЮ НА ДЕНЬ ${state.mentorQuoteDay}</button>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
+                <div style="font-weight:700; font-size:18px;">Список учеников (${students.length})</div>
+                <button class="btn btn-cyan" onclick="openStudentModal()"><i class="fa-solid fa-user-plus"></i> Добавить ученика</button>
+            </div>
+
+            <div class="grid-2">
+        `;
+
+        students.forEach(s => {
+            const hasSubmitted = state.reports.some(r => r.userId === s.id && r.date === todayStr);
+            const userReports = state.reports.filter(r => r.userId === s.id);
+            const avgPct = userReports.length > 0
+                ? Math.round((userReports.reduce((acc, r) => acc + (r.completedCoreTasksCount || 0), 0) / (userReports.length * 9)) * 100)
+                : 0;
+
+            html += `
+                <div class="card" style="display:flex; flex-direction:column; gap:12px;">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                        <div>
+                            <div style="font-weight:700; font-size:16px;">${escapeHtml(s.name)}</div>
+                            <div style="color:var(--text-muted); font-size:12px; margin-top:2px;">Логин: <b>${escapeHtml(s.login)}</b> • ${escapeHtml(s.phoneOrNote || 'Без заметок')}</div>
+                        </div>
+                        <span class="role-tag" style="background: ${hasSubmitted ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)'}; color: ${hasSubmitted ? 'var(--emerald)' : 'var(--danger)'}; padding: 6px 10px; font-size: 11px;">
+                            ${hasSubmitted ? 'Сдал' : 'Не сдал'}
+                        </span>
+                    </div>
+
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border); padding-top:12px; flex-wrap:wrap; gap:8px;">
+                        <span class="tabular-nums" style="font-size:12px;">Отчетов: <b>${userReports.length}</b> | Ср: <b style="color:var(--cyan);">${avgPct}%</b> | 🔥 <b>${s.streakDays || 0} дн.</b></span>
+                        <div style="display:flex; gap:6px;">
+                            <button class="btn btn-surface btn-sm" style="color:var(--cyan);" onclick="state.analyticsStudentFilter='${s.id}'; switchTab('analytics');" title="Открыть аналитику ученика"><i class="fa-solid fa-chart-line"></i> Аналитика</button>
+                            <button class="btn btn-surface btn-sm" onclick="openStudentModal('${s.id}')" title="Изменить"><i class="fa-solid fa-pen"></i></button>
+                            <button class="btn btn-surface btn-sm" style="color:var(--danger);" onclick="deleteUser('${s.id}')" title="Удалить"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+
+        html += `</div>`;
+        c.innerHTML = html;
+    }
+
+    async function saveMotivation() {
+        const t = document.getElementById('mentor-mot-input').value.trim();
+        if (!t) return showToast('Введите текст мотивации!', true);
+        const res = await postAPI({
+            action: 'update_quote',
+            quote: {
+                dayOfMonth: state.mentorQuoteDay,
+                text: t,
+                author: state.currentUser.name,
+                category: 'Мотивация дня'
+            }
+        });
+        if (res.status === 'success') {
+            showToast(`Мотивация на день ${state.mentorQuoteDay} обновлена!`);
+            syncAllData(true);
+        } else {
+            showToast(res.message || 'Ошибка сохранения', true);
+        }
+    }
+
+    function openStudentModal(editUserId = null) {
+        const existing = editUserId ? state.users.find(u => u.id === editUserId) : null;
+        const modal = document.getElementById('modal-container');
+        const body = document.getElementById('modal-body');
+
+        body.innerHTML = `
+            <h3 style="font-size: 18px; font-weight: 800;">${existing ? 'Редактировать ученика' : 'Добавить ученика'}</h3>
+            <input type="hidden" id="edit-user-id" value="${existing ? existing.id : ''}">
+            <div>
+                <label style="font-size:12px; color:var(--text-muted);">Имя и Фамилия</label>
+                <input type="text" id="new-name" placeholder="Имя и Фамилия" value="${existing ? escapeHtml(existing.name) : ''}">
+            </div>
+            <div>
+                <label style="font-size:12px; color:var(--text-muted);">Логин</label>
+                <input type="text" id="new-login" placeholder="Логин" value="${existing ? escapeHtml(existing.login) : ''}">
+            </div>
+            <div>
+                <label style="font-size:12px; color:var(--text-muted);">Пароль</label>
+                <input type="text" id="new-pass" placeholder="Пароль" value="123">
+            </div>
+            <div>
+                <label style="font-size:12px; color:var(--text-muted);">Телефон или заметка</label>
+                <input type="text" id="new-phone" placeholder="Телефон или заметка" value="${existing ? escapeHtml(existing.phoneOrNote || '') : ''}">
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                <button class="btn btn-surface" style="flex:1;" onclick="closeModal()">Отмена</button>
+                <button class="btn btn-cyan" style="flex:1;" onclick="submitStudentModal()">${existing ? 'Сохранить' : 'Создать'}</button>
+            </div>
+        `;
+        modal.classList.remove('hidden');
+    }
+
+    async function submitStudentModal() {
+        const editId = document.getElementById('edit-user-id').value.trim();
+        const name = document.getElementById('new-name').value.trim();
+        const login = document.getElementById('new-login').value.trim();
+        const pass = document.getElementById('new-pass').value.trim();
+        const phone = document.getElementById('new-phone').value.trim();
+
+        if (!name || !login || !pass) return showToast('Заполните обязательные поля!', true);
+
+        const existing = editId ? state.users.find(u => u.id === editId) : null;
+        const userObj = {
+            id: existing ? existing.id : ('student_' + Math.random().toString(36).substr(2, 8)),
+            login,
+            name,
+            role: 'STUDENT',
+            streakDays: existing ? (existing.streakDays || 0) : 0,
+            totalReports: existing ? (existing.totalReports || 0) : 0,
+            phoneOrNote: phone
+        };
+
+        closeModal();
+        const res = await postAPI({
+            action: existing ? 'update_user' : 'add_user',
+            user: userObj,
+            password: pass
+        });
+        if (res.status === 'success') {
+            showToast(existing ? 'Данные ученика обновлены!' : 'Ученик успешно добавлен!');
+            await syncAllData(true);
+        } else {
+            showToast('Ошибка: ' + res.message, true);
+        }
+    }
+
+    async function deleteUser(id) {
+        const u = state.users.find(item => item.id === id);
+        if (!confirm(`Удалить ученика ${u ? u.name : ''}?`)) return;
+        state.users = state.users.filter(item => item.id !== id);
+        render();
+        await postAPI({ action: 'delete_user', userId: id });
+        showToast('Ученик удален');
+        syncAllData(true);
+    }
+
+    function closeModal() {
+        document.getElementById('modal-container').classList.add('hidden');
+    }
+
+    // ============================================================================
+    // 3. ПОЛНОЦЕННЫЙ ДАШБОРД АНАЛИТИКИ И ТАБЛИЦА БД (ТОЛЬКО ДЛЯ НАСТАВНИКА)
+    // ============================================================================
+    function getAnalyticsDateWindow() {
+        const todayStr = getLocalTodayStr();
+        const p = state.analyticsPeriodFilter;
+        if (p === 'TODAY') return { start: todayStr, end: todayStr, days: 7 };
+        if (p === 'WEEK') {
+            const d = new Date(); d.setDate(d.getDate() - 6);
+            return { start: getLocalTodayStr(d), end: todayStr, days: 7 };
+        }
+        if (p === 'DAYS_14') {
+            const d = new Date(); d.setDate(d.getDate() - 13);
+            return { start: getLocalTodayStr(d), end: todayStr, days: 14 };
+        }
+        if (p === 'MONTH') {
+            const d = new Date(); d.setDate(d.getDate() - 29);
+            return { start: getLocalTodayStr(d), end: todayStr, days: 30 };
+        }
+        if (p === 'CUSTOM') {
+            const s = state.analyticsStartDate || '2024-01-01';
+            const e = state.analyticsEndDate || todayStr;
+            const diff = Math.round((new Date(e) - new Date(s)) / (1000 * 3600 * 24)) + 1;
+            const days = Math.max(1, Math.min(60, isNaN(diff) ? 30 : diff));
+            return { start: s <= e ? s : e, end: s <= e ? e : s, days };
+        }
+        // 'ALL'
+        const allDates = state.reports.map(r => r.date).filter(Boolean).sort();
+        return {
+            start: allDates.length > 0 ? allDates[0] : '2024-01-01',
+            end: todayStr,
+            days: 30
+        };
+    }
+
+    function getReportPctByTask(rep, taskKey) {
+        if (!rep) return 0;
+        if (taskKey === 'ALL') {
+            return Math.round(((rep.completedCoreTasksCount || 0) / 9) * 100);
+        }
+        return isTaskDone(rep, taskKey) ? 100 : 0;
+    }
+
+    function getFilteredAnalyticsReports() {
+        const { start, end } = getAnalyticsDateWindow();
+        const todayStr = getLocalTodayStr();
+        const submittedTodaySet = new Set(
+            state.reports.filter(r => r.date === todayStr).map(r => r.userId)
+        );
+        const q = state.analyticsSearchQuery.trim().toLowerCase();
+
+        return state.reports.filter(r => {
+            if (state.analyticsStudentFilter !== 'ALL' && r.userId !== state.analyticsStudentFilter) {
+                return false;
+            }
+            if (state.analyticsPeriodFilter !== 'ALL') {
+                if (r.date < start || r.date > end) return false;
+            }
+            if (state.analyticsTodayStatus === 'SUBMITTED' && !submittedTodaySet.has(r.userId)) {
+                return false;
+            }
+            if (state.analyticsTodayStatus === 'MISSING' && submittedTodaySet.has(r.userId)) {
+                return false;
+            }
+            const count = r.completedCoreTasksCount || 0;
+            if (state.analyticsLevelFilter === 'HIGH' && count < 8) return false;
+            if (state.analyticsLevelFilter === 'MEDIUM' && (count < 5 || count > 7)) return false;
+            if (state.analyticsLevelFilter === 'LOW' && count > 4) return false;
+
+            if (q) {
+                const matchName = (r.userName || '').toLowerCase().includes(q);
+                const matchDate = (r.date || '').toLowerCase().includes(q);
+                const matchBook = (r.readingBookDetails || '').toLowerCase().includes(q);
+                const matchComm = (r.comments || '').toLowerCase().includes(q);
+                if (!matchName && !matchDate && !matchBook && !matchComm) return false;
+            }
+            return true;
+        });
+    }
+
+    function renderAnalytics(c) {
+        const students = state.users.filter(u => u.role === 'STUDENT');
+        const todayStr = getLocalTodayStr();
+        const submittedTodaySet = new Set(
+            state.reports.filter(r => r.date === todayStr).map(r => r.userId)
+        );
+        const submittedTodayCount = students.filter(s => submittedTodaySet.has(s.id)).length;
+
+        const { start, end, days } = getAnalyticsDateWindow();
+        const filteredReports = getFilteredAnalyticsReports();
+
+        // Сортировка таблицы отчетов
+        const sortedReports = [...filteredReports].sort((a, b) => {
+            let cmp = 0;
+            const f = state.analyticsSortField;
+            if (f === 'date') cmp = a.date.localeCompare(b.date) || (a.time || '').localeCompare(b.time || '');
+            else if (f === 'userName') cmp = (a.userName || '').localeCompare(b.userName || '', 'ru');
+            else if (f === 'completedCoreTasksCount') cmp = (a.completedCoreTasksCount || 0) - (b.completedCoreTasksCount || 0);
+            else if (f === 'physicalExerciseMin') cmp = parseMinutes(a.physicalExerciseMin) - parseMinutes(b.physicalExerciseMin);
+            else if (f === 'relaxationMin') cmp = parseMinutes(a.relaxationMin) - parseMinutes(b.relaxationMin);
+            return state.analyticsSortDir === 'asc' ? cmp : -cmp;
+        });
+
+        // Сводные KPI показатели по выборке
+        let sumPct = 0, sumTasks = 0, totalPhysMin = 0, totalRelaxMin = 0, booksCount = 0;
+        const uniqueStudentsSet = new Set();
+        filteredReports.forEach(r => {
+            uniqueStudentsSet.add(r.userId);
+            sumTasks += (r.completedCoreTasksCount || 0);
+            sumPct += getReportPctByTask(r, state.analyticsTaskFilter);
+            totalPhysMin += parseMinutes(r.physicalExerciseMin);
+            totalRelaxMin += parseMinutes(r.relaxationMin);
+            if (isTaskDone(r, 't3')) booksCount++;
+        });
+
+        const avgPct = filteredReports.length > 0 ? Math.round(sumPct / filteredReports.length) : 0;
+        const avgTasks = filteredReports.length > 0 ? (sumTasks / filteredReports.length).toFixed(1) : '0.0';
+
+        // Построение точек графика по дням (0% .. 100%)
+        const endRefDate = (state.analyticsPeriodFilter === 'CUSTOM' && state.analyticsEndDate)
+            ? new Date(state.analyticsEndDate)
+            : new Date();
+        const chartPoints = [];
+
+        for (let i = days - 1; i >= 0; i--) {
+            const d = new Date(endRefDate);
+            d.setDate(d.getDate() - i);
+            const dateStr = getLocalTodayStr(d);
+            const dayReps = filteredReports.filter(r => r.date === dateStr);
+
+            let pct = 0;
+            if (dayReps.length > 0) {
+                const s = dayReps.reduce((acc, rep) => acc + getReportPctByTask(rep, state.analyticsTaskFilter), 0);
+                pct = Math.round(s / dayReps.length);
+            }
+
+            chartPoints.push({
+                dateStr,
+                label: `${d.getDate()} ${monthsRu[d.getMonth()]}`,
+                pct,
+                count: dayReps.length
+            });
+        }
+
+        const svgW = 620;
+        const svgH = 185;
+        const stepX = chartPoints.length > 1 ? svgW / (chartPoints.length - 1) : svgW / 2;
+
+        const coords = chartPoints.map((pt, idx) => {
+            const x = chartPoints.length > 1 ? idx * stepX : svgW / 2;
+            const clampedPct = Math.min(100, Math.max(0, pt.pct));
+            const y = (svgH - 22) - (clampedPct / 100) * (svgH - 42);
+            return { x, y, pt, idx };
+        });
+
+        const pointStr = coords.map(c => `${c.x.toFixed(1)},${c.y.toFixed(1)}`).join(' ');
+        const areaPath = coords.length > 0
+            ? `M ${coords[0].x.toFixed(1)} ${svgH - 22} ` +
+              coords.map(c => `L ${c.x.toFixed(1)} ${c.y.toFixed(1)}`).join(' ') +
+              ` L ${coords[coords.length - 1].x.toFixed(1)} ${svgH - 22} Z`
+            : '';
+
+        // Подписи оси X (равные интервалы с использованием исправленного monthsRu)
+        const tickCount = days <= 7 ? days : 6;
+        const xDateLabels = [];
+        if (chartPoints.length > 0) {
+            const step = Math.max(1, (chartPoints.length - 1) / Math.max(1, tickCount - 1));
+            for (let i = 0; i < tickCount; i++) {
+                const idx = Math.min(chartPoints.length - 1, Math.round(i * step));
+                xDateLabels.push(chartPoints[idx].label);
+            }
+        }
+
+        const selectedStudentObj = students.find(s => s.id === state.analyticsStudentFilter);
+        const activePoint = (state.analyticsSelectedPointIdx !== null && chartPoints[state.analyticsSelectedPointIdx])
+            ? chartPoints[state.analyticsSelectedPointIdx]
+            : null;
+
+        // Статистика по каждой из 9 задач
+        const tasksBreakdownHtml = ['t1','t2','t3','t4','t5','t6','t7','t8','t9'].map(tKey => {
+            const doneCount = filteredReports.filter(r => isTaskDone(r, tKey)).length;
+            const pct = filteredReports.length > 0 ? Math.round((doneCount / filteredReports.length) * 100) : 0;
+            const isSelected = state.analyticsTaskFilter === tKey;
+            const barColor = pct >= 80 ? 'var(--emerald)' : pct >= 50 ? 'var(--cyan)' : 'var(--gold)';
+            return `
+                <div onclick="setAnalyticsTask('${isSelected ? 'ALL' : tKey}')" style="cursor:pointer; padding:7px 10px; border-radius:10px; border:1px solid ${isSelected ? 'var(--cyan)' : 'transparent'}; background:${isSelected ? 'rgba(0,210,255,0.12)' : 'rgba(15,23,42,0.4)'};">
+                    <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px;">
+                        <span style="font-weight:${isSelected ? '800' : '600'}; color:${isSelected ? 'var(--cyan)' : 'var(--text-white)'};">${TASK_NAMES[tKey]}</span>
+                        <span class="tabular-nums" style="font-weight:700; color:var(--text-muted);">${doneCount}/${filteredReports.length} (${pct}%)</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill" style="width:${pct}%; background:${barColor};"></div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        // Рейтинг учеников
+        const studentRankings = students.map(s => {
+            const sReps = filteredReports.filter(r => r.userId === s.id);
+            const cnt = sReps.length;
+            const sTasks = sReps.reduce((acc, r) => acc + (r.completedCoreTasksCount || 0), 0);
+            const sPct = cnt > 0 ? Math.round((sTasks / (cnt * 9)) * 100) : 0;
+            const sAvg = cnt > 0 ? (sTasks / cnt).toFixed(1) : '0.0';
+            const sPhys = sReps.reduce((acc, r) => acc + parseMinutes(r.physicalExerciseMin), 0);
+            const sRelax = sReps.reduce((acc, r) => acc + parseMinutes(r.relaxationMin), 0);
+            const sBooks = sReps.filter(r => isTaskDone(r, 't3')).length;
+            return {
+                student: s,
+                cnt,
+                sPct,
+                sAvg,
+                sPhys,
+                sRelax,
+                sBooks,
+                hasToday: submittedTodaySet.has(s.id)
+            };
+        }).sort((a, b) => b.sPct - a.sPct || b.cnt - a.cnt);
+
+        let html = `
+            <!-- Шапка Дашборда -->
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+                <div>
+                    <h2 style="font-size:22px; font-weight:800;">Аналитический Дашборд Наставника 📊</h2>
+                    <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">
+                        Полная аналитика, фильтрация по 9 задачам и живая таблица базы данных Google Sheets (${start} — ${end})
+                    </div>
+                </div>
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                    <button class="btn btn-surface btn-sm" onclick="resetAnalyticsFilters()"><i class="fa-solid fa-filter-circle-xmark"></i> Сбросить фильтры</button>
+                    <button class="btn btn-emerald btn-sm" onclick="exportAnalyticsCSV()"><i class="fa-solid fa-file-csv"></i> Скачать Excel (CSV)</button>
+                    <button class="btn btn-cyan btn-sm" onclick="syncAllData(true)"><i class="fa-solid fa-rotate"></i> Обновить БД</button>
+                </div>
+            </div>
+
+            <!-- 4 KPI Карточки -->
+            <div class="grid-4">
+                <div class="card" style="padding:16px;">
+                    <div style="color:var(--text-muted); font-size:12px;">Отчетов по фильтру</div>
+                    <div class="tabular-nums" style="font-size:26px; font-weight:800; margin-top:4px;">${filteredReports.length} <span style="font-size:12px; font-weight:500; color:var(--text-muted);">из ${state.reports.length}</span></div>
+                    <div style="font-size:11px; color:var(--text-muted); margin-top:6px;">Учеников в выборке: <b style="color:var(--text-white);">${uniqueStudentsSet.size}</b> из ${students.length}</div>
+                </div>
+
+                <div class="card" style="padding:16px;">
+                    <div style="color:var(--text-muted); font-size:12px;">Средняя успеваемость</div>
+                    <div class="tabular-nums" style="font-size:26px; font-weight:800; color:var(--cyan); margin-top:4px;">${avgPct}% <span style="font-size:12px; font-weight:600; color:var(--text-muted);">(${avgTasks}/9)</span></div>
+                    <div class="progress-track" style="margin-top:8px;">
+                        <div class="progress-fill" style="width:${avgPct}%; background:var(--cyan);"></div>
+                    </div>
+                </div>
+
+                <div class="card" style="padding:16px;">
+                    <div style="color:var(--text-muted); font-size:12px;">Сумма практик за период</div>
+                    <div class="tabular-nums" style="font-size:20px; font-weight:800; color:var(--gold); margin-top:6px;">
+                        ${totalPhysMin} <span style="font-size:11px; color:var(--text-muted);">мин физ.</span> / ${totalRelaxMin} <span style="font-size:11px; color:var(--text-muted);">мин релакс</span>
+                    </div>
+                    <div style="font-size:11px; color:var(--text-muted); margin-top:6px;">Отчетов с чтением книги: <b style="color:var(--text-white);">${booksCount}</b></div>
+                </div>
+
+                <div class="card" style="padding:16px;">
+                    <div style="color:var(--text-muted); font-size:12px;">Сдали сегодня (${todayStr})</div>
+                    <div class="tabular-nums" style="font-size:26px; font-weight:800; color:var(--emerald); margin-top:4px;">${submittedTodayCount} / ${students.length}</div>
+                    <div style="font-size:11px; color:var(--text-muted); margin-top:6px;">Не сдали сегодня: <b style="color:var(--danger);">${Math.max(0, students.length - submittedTodayCount)} уч.</b></div>
+                </div>
+            </div>
+
+            <!-- Панель всех фильтраций -->
+            <div class="card" style="display:flex; flex-direction:column; gap:14px; padding:18px;">
+                <!-- Фильтр 1: Ученик -->
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                    <span style="font-size:12px; color:var(--text-muted); font-weight:700;">1. Фильтр по ученику:</span>
+                    <div class="filter-bar">
+                        <div class="filter-chip ${state.analyticsStudentFilter === 'ALL' ? 'active' : ''}" onclick="setAnalyticsStudent('ALL')">
+                            Все ученики (${students.length})
+                        </div>
+                        ${students.map(u => {
+                            const hasToday = submittedTodaySet.has(u.id);
+                            return `
+                                <div class="filter-chip ${state.analyticsStudentFilter === u.id ? 'active' : ''}" onclick="setAnalyticsStudent('${u.id}')">
+                                    <span>${escapeHtml(u.name)}</span>
+                                    ${hasToday ? '<span style="color:#10B981; font-weight:800;">✓</span>' : ''}
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+
+                <!-- Фильтр 2: Задания (9 задач) -->
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                    <span style="font-size:12px; color:var(--text-muted); font-weight:700;">2. Фильтр по заданию марафона:</span>
+                    <div class="filter-bar">
+                        ${Object.keys(TASK_NAMES).map(k => `
+                            <div class="filter-chip ${state.analyticsTaskFilter === k ? 'active' : ''}" onclick="setAnalyticsTask('${k}')">
+                                ${TASK_NAMES[k]}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <!-- Фильтр 3: Период, Качество выполнения и Поиск -->
+                <div class="grid-3" style="align-items:end;">
+                    <div style="display:flex; flex-direction:column; gap:6px;">
+                        <span style="font-size:12px; color:var(--text-muted); font-weight:700;">3. Период:</span>
+                        <div class="filter-bar">
+                            <div class="filter-chip ${state.analyticsPeriodFilter === 'TODAY' ? 'active' : ''}" onclick="setAnalyticsPeriod('TODAY')">Сегодня</div>
+                            <div class="filter-chip ${state.analyticsPeriodFilter === 'WEEK' ? 'active' : ''}" onclick="setAnalyticsPeriod('WEEK')">7 дней</div>
+                            <div class="filter-chip ${state.analyticsPeriodFilter === 'DAYS_14' ? 'active' : ''}" onclick="setAnalyticsPeriod('DAYS_14')">14 дней</div>
+                            <div class="filter-chip ${state.analyticsPeriodFilter === 'MONTH' ? 'active' : ''}" onclick="setAnalyticsPeriod('MONTH')">30 дней</div>
+                            <div class="filter-chip ${state.analyticsPeriodFilter === 'ALL' ? 'active' : ''}" onclick="setAnalyticsPeriod('ALL')">Все</div>
+                            <div class="filter-chip ${state.analyticsPeriodFilter === 'CUSTOM' ? 'active' : ''}" onclick="setAnalyticsPeriod('CUSTOM')">От — До</div>
+                        </div>
+                    </div>
+
+                    <div style="display:flex; flex-direction:column; gap:6px;">
+                        <span style="font-size:12px; color:var(--text-muted); font-weight:700;">4. Уровень выполнения:</span>
+                        <div class="filter-bar">
+                            <div class="filter-chip ${state.analyticsLevelFilter === 'ALL' ? 'active' : ''}" onclick="setAnalyticsLevel('ALL')">Все</div>
+                            <div class="filter-chip ${state.analyticsLevelFilter === 'HIGH' ? 'active' : ''}" onclick="setAnalyticsLevel('HIGH')">8–9 задач</div>
+                            <div class="filter-chip ${state.analyticsLevelFilter === 'MEDIUM' ? 'active' : ''}" onclick="setAnalyticsLevel('MEDIUM')">5–7 задач</div>
+                            <div class="filter-chip ${state.analyticsLevelFilter === 'LOW' ? 'active' : ''}" onclick="setAnalyticsLevel('LOW')">0–4 задач</div>
+                        </div>
+                    </div>
+
+                    <div style="display:flex; flex-direction:column; gap:6px;">
+                        <span style="font-size:12px; color:var(--text-muted); font-weight:700;">5. Поиск по таблице (имя, книга, дата, коммент):</span>
+                        <input type="text" id="analytics-search-input" placeholder="Быстрый поиск..." value="${escapeHtml(state.analyticsSearchQuery)}" oninput="handleAnalyticsSearch(this.value)">
+                    </div>
+                </div>
+
+                ${state.analyticsPeriodFilter === 'CUSTOM' ? `
+                    <div class="grid-2" style="background:var(--surface-dark); padding:12px; border-radius:12px; border:1px solid var(--border);">
+                        <div>
+                            <label style="font-size:11px; color:var(--text-muted);">Начало периода (От):</label>
+                            <input type="date" value="${state.analyticsStartDate}" onchange="state.analyticsStartDate=this.value; render();">
+                        </div>
+                        <div>
+                            <label style="font-size:11px; color:var(--text-muted);">Конец периода (До):</label>
+                            <input type="date" value="${state.analyticsEndDate}" onchange="state.analyticsEndDate=this.value; render();">
+                        </div>
+                    </div>
+                ` : ''}
+            </div>
+
+            <!-- Графики: Линейный график Cyan + Разбивка по 9 задачам -->
+            <div class="analytics-charts-grid">
+                <!-- Линейный график 0..100% -->
+                <div class="card" style="background:#1E222D; display:flex; flex-direction:column; justify-content:space-between; gap:14px;">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:8px;">
+                        <div>
+                            <div style="font-size:17px; font-weight:800; color:#F8FAFC;">${TASK_NAMES[state.analyticsTaskFilter]}</div>
+                            <div style="font-size:13px; color:var(--cyan); font-weight:600; margin-top:2px;">
+                                Ученик: ${selectedStudentObj ? escapeHtml(selectedStudentObj.name) : `Все ученики (${students.length})`}
+                            </div>
+                        </div>
+                        <span style="font-weight:700; color:var(--cyan); font-size:13px;">Ось Y: 0% — 100%</span>
+                    </div>
+
+                    <div style="background:rgba(15,23,42,0.65); padding:8px 12px; border-radius:10px; font-size:12px; display:flex; justify-content:space-between; align-items:center;">
+                        ${activePoint ? `
+                            <span>📅 <b>${activePoint.label} (${activePoint.dateStr})</b></span>
+                            <span class="tabular-nums" style="color:var(--cyan); font-weight:800;">Выполнение: ${activePoint.pct}% (отчетов: ${activePoint.count})</span>
+                        ` : `
+                            <span style="color:var(--text-muted);">Нажмите на любую точку графика для просмотра точного результата за день</span>
+                        `}
+                    </div>
+
+                    <div style="display:flex; gap:10px; align-items:stretch;">
+                        <div class="tabular-nums" style="display:flex; flex-direction:column; justify-content:space-between; font-size:11px; font-weight:700; color:#94A3B8; text-align:right; width:38px; padding-bottom:14px;">
+                            <span>100%</span>
+                            <span>75%</span>
+                            <span>50%</span>
+                            <span>25%</span>
+                            <span>0%</span>
+                        </div>
+
+                        <div style="flex:1; overflow-x:auto;">
+                            <svg viewBox="0 0 ${svgW} ${svgH}" style="width:100%; height:185px; overflow:visible;">
+                                <defs>
+                                    <linearGradient id="cyanGrad" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="0%" stop-color="#00D2FF" stop-opacity="0.28"/>
+                                        <stop offset="100%" stop-color="#00D2FF" stop-opacity="0.0"/>
+                                    </linearGradient>
+                                </defs>
+                                <line x1="0" y1="20" x2="${svgW}" y2="20" stroke="#2A2D3D" stroke-width="1" />
+                                <line x1="0" y1="55.7" x2="${svgW}" y2="55.7" stroke="#2A2D3D" stroke-width="1" />
+                                <line x1="0" y1="91.5" x2="${svgW}" y2="91.5" stroke="#2A2D3D" stroke-width="1" />
+                                <line x1="0" y1="127.2" x2="${svgW}" y2="127.2" stroke="#2A2D3D" stroke-width="1" />
+                                <line x1="0" y1="163" x2="${svgW}" y2="163" stroke="#2A2D3D" stroke-width="1" />
+
+                                ${areaPath ? `<path d="${areaPath}" fill="url(#cyanGrad)" />` : ''}
+                                <polyline points="${pointStr}" fill="none" stroke="#00D2FF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+
+                                ${coords.map(c => `
+                                    <g style="cursor:pointer;" onclick="state.analyticsSelectedPointIdx=${c.idx}; render();">
+                                        <circle cx="${c.x.toFixed(1)}" cy="${c.y.toFixed(1)}" r="10" fill="transparent" />
+                                        <circle cx="${c.x.toFixed(1)}" cy="${c.y.toFixed(1)}" r="${state.analyticsSelectedPointIdx === c.idx ? 5.5 : (c.pt.count > 0 ? 3.5 : 2)}" fill="${c.pt.count > 0 ? '#00D2FF' : '#475569'}" stroke="#0F172A" stroke-width="1.5" />
+                                    </g>
+                                `).join('')}
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="tabular-nums" style="display:flex; justify-content:space-between; color:#94A3B8; font-size:11px; font-weight:600; padding-left:48px;">
+                        ${xDateLabels.map(lbl => `<span>${lbl}</span>`).join('')}
+                    </div>
+                </div>
+
+                <!-- Рейтинг выполнения 9 задач -->
+                <div class="card" style="display:flex; flex-direction:column; justify-content:space-between; gap:10px;">
+                    <div>
+                        <div style="font-size:16px; font-weight:800;">Выполнение каждой из 9 задач</div>
+                        <div style="font-size:11px; color:var(--text-muted);">Нажмите на задачу для фильтрации графика</div>
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:6px;">
+                        ${tasksBreakdownHtml}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Блок Таблиц БД Google Sheets -->
+            <div class="card" style="display:flex; flex-direction:column; gap:14px; padding:18px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                    <!-- Переключатель 3 видов таблиц -->
+                    <div class="filter-bar">
+                        <div class="filter-chip ${state.analyticsTableMode === 'REPORTS_TABLE' ? 'active' : ''}" onclick="state.analyticsTableMode='REPORTS_TABLE'; render();">
+                            <i class="fa-solid fa-table"></i> Таблица отчетов БД (${sortedReports.length})
+                        </div>
+                        <div class="filter-chip ${state.analyticsTableMode === 'DAILY_MATRIX' ? 'active' : ''}" onclick="state.analyticsTableMode='DAILY_MATRIX'; render();">
+                            <i class="fa-solid fa-calendar-check"></i> Шахматка по дням
+                        </div>
+                        <div class="filter-chip ${state.analyticsTableMode === 'STUDENTS_RANKING' ? 'active' : ''}" onclick="state.analyticsTableMode='STUDENTS_RANKING'; render();">
+                            <i class="fa-solid fa-ranking-star"></i> Рейтинг учеников (${students.length})
+                        </div>
+                    </div>
+
+                    <!-- Быстрый фильтр сдачи сегодня -->
+                    <div class="filter-bar">
+                        <div class="filter-chip ${state.analyticsTodayStatus === 'ALL' ? 'active' : ''}" onclick="state.analyticsTodayStatus='ALL'; render();">Все</div>
+                        <div class="filter-chip ${state.analyticsTodayStatus === 'SUBMITTED' ? 'active' : ''}" onclick="state.analyticsTodayStatus='SUBMITTED'; render();">Сдали сегодня (${submittedTodayCount})</div>
+                        <div class="filter-chip ${state.analyticsTodayStatus === 'MISSING' ? 'active' : ''}" onclick="state.analyticsTodayStatus='MISSING'; render();">Не сдали (${Math.max(0, students.length - submittedTodayCount)})</div>
+                    </div>
+                </div>
+
+                ${renderAnalyticsActiveTable(sortedReports, studentRankings, chartPoints, avgTasks, avgPct, totalPhysMin, totalRelaxMin, booksCount)}
+            </div>
+        `;
+
+        c.innerHTML = html;
+    }
+
+    function renderAnalyticsActiveTable(sortedReports, studentRankings, chartPoints, avgTasks, avgPct, totalPhysMin, totalRelaxMin, booksCount) {
+        if (state.analyticsTableMode === 'REPORTS_TABLE') {
+            const sortIcon = (field) => {
+                if (state.analyticsSortField !== field) return '<i class="fa-solid fa-sort" style="opacity:0.4;"></i>';
+                return state.analyticsSortDir === 'asc'
+                    ? '<i class="fa-solid fa-sort-up" style="color:var(--cyan);"></i>'
+                    : '<i class="fa-solid fa-sort-down" style="color:var(--cyan);"></i>';
+            };
+
+            return `
+                <div class="table-wrapper">
+                    <table class="data-table tabular-nums">
+                        <thead>
+                            <tr>
+                                <th class="sortable" onclick="toggleAnalyticsSort('date')">Дата ${sortIcon('date')}</th>
+                                <th class="sortable" onclick="toggleAnalyticsSort('userName')">Ученик ${sortIcon('userName')}</th>
+                                <th class="sortable" style="text-align:center;" onclick="toggleAnalyticsSort('completedCoreTasksCount')">Итог (9) ${sortIcon('completedCoreTasksCount')}</th>
+                                <th class="sortable" style="text-align:right;" onclick="toggleAnalyticsSort('physicalExerciseMin')">1. Физ. ${sortIcon('physicalExerciseMin')}</th>
+                                <th class="sortable" style="text-align:right;" onclick="toggleAnalyticsSort('relaxationMin')">2. Релакс ${sortIcon('relaxationMin')}</th>
+                                <th>3. Книга</th>
+                                <th style="text-align:center;">4. Хот</th>
+                                <th style="text-align:center;">5. План</th>
+                                <th style="text-align:center;">6. Цель</th>
+                                <th style="text-align:center;">7. Улыб</th>
+                                <th style="text-align:center;">8. Увер</th>
+                                <th style="text-align:center;">9. Афф</th>
+                                <th>Комментарий</th>
+                                <th style="text-align:right;">Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${sortedReports.length === 0 ? `
+                                <tr><td colspan="14" style="text-align:center; padding:26px; color:var(--text-muted);">Отчетов по выбранным фильтрам не найдено</td></tr>
+                            ` : sortedReports.map(r => {
+                                const cnt = r.completedCoreTasksCount || 0;
+                                const pct = Math.round((cnt / 9) * 100);
+                                const scoreColor = cnt >= 8 ? 'var(--emerald)' : cnt >= 5 ? 'var(--cyan)' : 'var(--gold)';
+                                const yesNo = (v) => v ? '<span class="badge-yes">ДА</span>' : '<span class="badge-no">—</span>';
+                                return `
+                                    <tr>
+                                        <td style="white-space:nowrap;">
+                                            <b>${escapeHtml(r.date)}</b>
+                                            ${r.time ? `<div style="font-size:10px; color:var(--text-muted);">${escapeHtml(r.time)}</div>` : ''}
+                                        </td>
+                                        <td style="white-space:nowrap;">
+                                            <span style="color:var(--cyan); font-weight:700; cursor:pointer;" onclick="setAnalyticsStudent('${r.userId}')">${escapeHtml(r.userName)}</span>
+                                        </td>
+                                        <td style="text-align:center; font-weight:800; color:${scoreColor}; white-space:nowrap;">
+                                            ${cnt}/9 (${pct}%)
+                                        </td>
+                                        <td style="text-align:right; white-space:nowrap;">${parseMinutes(r.physicalExerciseMin)} мин</td>
+                                        <td style="text-align:right; white-space:nowrap;">${parseMinutes(r.relaxationMin)} мин</td>
+                                        <td style="max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${escapeHtml(r.readingBookDetails)}">
+                                            ${r.readingBookDetails ? escapeHtml(r.readingBookDetails) : '<span class="badge-no">—</span>'}
+                                        </td>
+                                        <td style="text-align:center;">${yesNo(r.memoryCompleted)}</td>
+                                        <td style="text-align:center;">${yesNo(r.planCompleted)}</td>
+                                        <td style="text-align:center;">${yesNo(r.goalCompleted)}</td>
+                                        <td style="text-align:center;">${yesNo(r.smileCompleted)}</td>
+                                        <td style="text-align:center;">${yesNo(r.confidenceCompleted)}</td>
+                                        <td style="text-align:center;">${yesNo(r.affirmationCompleted)}</td>
+                                        <td style="max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${escapeHtml(r.comments)}">
+                                            ${r.comments ? escapeHtml(r.comments) : '<span class="badge-no">—</span>'}
+                                        </td>
+                                        <td style="text-align:right; white-space:nowrap;">
+                                            <button class="btn btn-surface btn-sm" onclick="inspectReportModal('${r.id}')" title="Подробно"><i class="fa-solid fa-eye"></i></button>
+                                            <button class="btn btn-surface btn-sm" style="color:var(--danger);" onclick="deleteReport('${r.id}')" title="Удалить"><i class="fa-solid fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                        ${sortedReports.length > 0 ? `
+                            <tfoot>
+                                <tr>
+                                    <td>ИТОГО / СРЕДНЕЕ</td>
+                                    <td>Отчетов: ${sortedReports.length}</td>
+                                    <td style="text-align:center; color:var(--cyan);">Ср: ${avgTasks}/9 (${avgPct}%)</td>
+                                    <td style="text-align:right; color:var(--gold);">${totalPhysMin} мин</td>
+                                    <td style="text-align:right; color:var(--purple);">${totalRelaxMin} мин</td>
+                                    <td>Книг: ${booksCount}</td>
+                                    <td colspan="8" style="text-align:right; color:var(--text-muted); font-weight:500;">Синхронизировано с Google Sheets</td>
+                                </tr>
+                            </tfoot>
+                        ` : ''}
+                    </table>
+                </div>
+            `;
+        }
+
+        if (state.analyticsTableMode === 'DAILY_MATRIX') {
+            const matrixDays = chartPoints.slice(-14);
+            return `
+                <div class="table-wrapper">
+                    <table class="data-table tabular-nums">
+                        <thead>
+                            <tr>
+                                <th>Ученик</th>
+                                <th style="text-align:center;">Ср. %</th>
+                                ${matrixDays.map(d => `<th style="text-align:center;">${d.label}</th>`).join('')}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${studentRankings.map(row => `
+                                <tr>
+                                    <td style="font-weight:700; white-space:nowrap;">
+                                        <span style="cursor:pointer; color:var(--cyan);" onclick="setAnalyticsStudent('${row.student.id}'); state.analyticsTableMode='REPORTS_TABLE'; render();">${escapeHtml(row.student.name)}</span>
+                                    </td>
+                                    <td style="text-align:center; font-weight:800; color:var(--cyan);">${row.sPct}%</td>
+                                    ${matrixDays.map(d => {
+                                        const rep = state.reports.find(r => r.userId === row.student.id && r.date === d.dateStr);
+                                        if (!rep) return `<td style="text-align:center; color:#475569;">—</td>`;
+                                        const cnt = rep.completedCoreTasksCount || 0;
+                                        const bg = cnt >= 8 ? 'rgba(16,185,129,0.2)' : cnt >= 5 ? 'rgba(0,210,255,0.2)' : 'rgba(255,183,3,0.2)';
+                                        const col = cnt >= 8 ? 'var(--emerald)' : cnt >= 5 ? 'var(--cyan)' : 'var(--gold)';
+                                        return `<td style="text-align:center;"><span onclick="inspectReportModal('${rep.id}')" style="cursor:pointer; padding:4px 7px; border-radius:7px; background:${bg}; color:${col}; font-weight:800;">${cnt}/9</span></td>`;
+                                    }).join('')}
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        // STUDENTS_RANKING
+        return `
+            <div class="table-wrapper">
+                <table class="data-table tabular-nums">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Ученик / Логин</th>
+                            <th style="text-align:center;">Статус сегодня</th>
+                            <th style="text-align:center;">Стрик</th>
+                            <th style="text-align:center;">Отчетов</th>
+                            <th>Средний прогресс</th>
+                            <th style="text-align:right;">Физ. нагрузки</th>
+                            <th style="text-align:right;">Расслабление</th>
+                            <th style="text-align:center;">Книги</th>
+                            <th style="text-align:right;">Фильтр</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${studentRankings.map((row, idx) => `
+                            <tr>
+                                <td style="font-weight:800; color:var(--text-muted);">${idx + 1}</td>
+                                <td>
+                                    <div style="font-weight:800;">${escapeHtml(row.student.name)}</div>
+                                    <div style="font-size:11px; color:var(--text-muted);">@${escapeHtml(row.student.login)}</div>
+                                </td>
+                                <td style="text-align:center;">
+                                    ${row.hasToday ? '<span style="color:var(--emerald); font-weight:800;">Сдал</span>' : '<span style="color:var(--danger); font-weight:700;">Не сдал</span>'}
+                                </td>
+                                <td style="text-align:center; font-weight:800; color:var(--gold);">🔥 ${row.student.streakDays || 0}</td>
+                                <td style="text-align:center; font-weight:800;">${row.cnt}</td>
+                                <td style="min-width:140px;">
+                                    <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:4px;">
+                                        <b style="color:var(--cyan);">${row.sPct}%</b>
+                                        <span style="color:var(--text-muted);">${row.sAvg}/9</span>
+                                    </div>
+                                    <div class="progress-track">
+                                        <div class="progress-fill" style="width:${row.sPct}%; background:var(--cyan);"></div>
+                                    </div>
+                                </td>
+                                <td style="text-align:right;">${row.sPhys} мин</td>
+                                <td style="text-align:right;">${row.sRelax} мин</td>
+                                <td style="text-align:center;">${row.sBooks}</td>
+                                <td style="text-align:right;">
+                                    <button class="btn btn-surface btn-sm" style="color:var(--cyan);" onclick="setAnalyticsStudent('${row.student.id}'); state.analyticsTableMode='REPORTS_TABLE'; render();">Выбрать</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+    }
+
+    function setAnalyticsStudent(id) { state.analyticsStudentFilter = id; state.analyticsSelectedPointIdx = null; render(); }
+    function setAnalyticsTask(taskKey) { state.analyticsTaskFilter = taskKey; render(); }
+    function setAnalyticsPeriod(p) { state.analyticsPeriodFilter = p; state.analyticsSelectedPointIdx = null; render(); }
+    function setAnalyticsLevel(lvl) { state.analyticsLevelFilter = lvl; render(); }
+
+    function toggleAnalyticsSort(field) {
+        if (state.analyticsSortField === field) {
+            state.analyticsSortDir = state.analyticsSortDir === 'asc' ? 'desc' : 'asc';
+        } else {
+            state.analyticsSortField = field;
+            state.analyticsSortDir = 'desc';
+        }
+        render();
+    }
+
+    function handleAnalyticsSearch(val) {
+        state.analyticsSearchQuery = val;
+        render();
+        const input = document.getElementById('analytics-search-input');
+        if (input) {
+            input.focus();
+            input.setSelectionRange(input.value.length, input.value.length);
+        }
+    }
+
+    function resetAnalyticsFilters() {
+        state.analyticsStudentFilter = 'ALL';
+        state.analyticsTaskFilter = 'ALL';
+        state.analyticsPeriodFilter = 'MONTH';
+        state.analyticsLevelFilter = 'ALL';
+        state.analyticsTodayStatus = 'ALL';
+        state.analyticsSearchQuery = '';
+        state.analyticsSelectedPointIdx = null;
+        render();
+    }
+
+    function inspectReportModal(reportId) {
+        const r = state.reports.find(item => item.id === reportId);
+        if (!r) return;
+        const modal = document.getElementById('modal-container');
+        const body = document.getElementById('modal-body');
+        const cnt = r.completedCoreTasksCount || 0;
+        const pct = Math.round((cnt / 9) * 100);
+
+        body.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                <div>
+                    <h3 style="font-size:18px; font-weight:800;">Отчет: ${escapeHtml(r.userName)}</h3>
+                    <div style="font-size:12px; color:var(--cyan); margin-top:2px;">Дата: ${escapeHtml(r.date)} ${r.time ? 'в ' + escapeHtml(r.time) : ''}</div>
+                </div>
+                <span class="role-tag role-student" style="font-size:13px; padding:6px 12px;">${cnt}/9 (${pct}%)</span>
+            </div>
+
+            <div class="grid-2" style="font-size:13px;">
+                <div style="background:var(--surface-dark); padding:12px; border-radius:12px; border:1px solid var(--border);">
+                    <div style="color:var(--text-muted); font-size:11px;">1. Физ. нагрузки:</div>
+                    <div style="font-weight:800; margin-top:4px;">${escapeHtml(r.physicalExerciseMin)} мин</div>
+                </div>
+                <div style="background:var(--surface-dark); padding:12px; border-radius:12px; border:1px solid var(--border);">
+                    <div style="color:var(--text-muted); font-size:11px;">2. Расслабление:</div>
+                    <div style="font-weight:800; margin-top:4px;">${escapeHtml(r.relaxationMin)} мин</div>
+                </div>
+            </div>
+
+            <div style="background:var(--surface-dark); padding:12px; border-radius:12px; border:1px solid var(--border); font-size:13px;">
+                <div style="color:var(--text-muted); font-size:11px;">3. Чтение книги:</div>
+                <div style="font-weight:700; margin-top:4px;">${r.readingBookDetails ? escapeHtml(r.readingBookDetails) : 'Не указано'}</div>
+            </div>
+
+            <div class="grid-2" style="font-size:12px;">
+                <div>4. Хотира (память): <b>${r.memoryCompleted ? 'ДА ✅' : 'НЕТ'}</b></div>
+                <div>5. План на день: <b>${r.planCompleted ? 'ДА ✅' : 'НЕТ'}</b></div>
+                <div>6. Работа над целью: <b>${r.goalCompleted ? 'ДА ✅' : 'НЕТ'}</b></div>
+                <div>7. Улыбка: <b>${r.smileCompleted ? 'ДА ✅' : 'НЕТ'}</b></div>
+                <div>8. Уверенность: <b>${r.confidenceCompleted ? 'ДА ✅' : 'НЕТ'}</b></div>
+                <div>9. Аффирмации: <b>${r.affirmationCompleted ? 'ДА ✅' : 'НЕТ'}</b></div>
+            </div>
+
+            ${r.comments ? `
+                <div style="background:var(--surface-dark); padding:12px; border-radius:12px; border:1px solid var(--border); font-size:13px;">
+                    <div style="color:var(--text-muted); font-size:11px; margin-bottom:4px;">Комментарий к дню:</div>
+                    <div>${escapeHtml(r.comments)}</div>
+                </div>
+            ` : ''}
+
+            <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:6px;">
+                <button class="btn btn-surface" onclick="closeModal()">Закрыть</button>
+            </div>
+        `;
+        modal.classList.remove('hidden');
+    }
+
+    function exportAnalyticsCSV() {
+        const rows = getFilteredAnalyticsReports();
+        if (rows.length === 0) return showToast('Нет данных для экспорта', true);
+
+        const headers = [
+            'ID Отчета','Дата','Время','Ученик','Выполнено (из 9)','Процент (%)',
+            '1. Физ. нагрузки (мин)','2. Расслабление (мин)','3. Книга',
+            '4. Хотира','5. План','6. Цель','7. Улыбка','8. Уверенность','9. Аффирмации','Комментарий'
+        ];
+        const esc = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+
+        const lines = rows.map(r => {
+            const cnt = r.completedCoreTasksCount || 0;
+            const pct = Math.round((cnt / 9) * 100);
+            return [
+                r.id, r.date, r.time || '', r.userName, cnt, `${pct}%`,
+                r.physicalExerciseMin, r.relaxationMin, r.readingBookDetails,
+                r.memoryCompleted ? 'ДА' : 'НЕТ',
+                r.planCompleted ? 'ДА' : 'НЕТ',
+                r.goalCompleted ? 'ДА' : 'НЕТ',
+                r.smileCompleted ? 'ДА' : 'НЕТ',
+                r.confidenceCompleted ? 'ДА' : 'НЕТ',
+                r.affirmationCompleted ? 'ДА' : 'НЕТ',
+                r.comments
+            ].map(esc).join(';');
+        });
+
+        const csv = '\uFEFF' + [headers.map(esc).join(';'), ...lines].join('\r\n');
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `marathon_analytics_${getLocalTodayStr()}.csv`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        showToast('Таблица успешно выгружена в CSV (Excel)!');
+    }
+
+    // ============================================================================
+    // 4. ЗАДАНИЯ ДНЯ (ОТПРАВКА И ОБНОВЛЕНИЕ ОТЧЕТА УЧЕНИКА)
+    // ============================================================================
+    function renderTasks(c) {
+        const selectedDate = state.taskSelectedDate || getLocalTodayStr();
+        const existing = state.reports.find(r => r.userId === state.currentUser.id && r.date === selectedDate);
+
+        c.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                <h2 style="font-size:22px; font-weight:800;">Задание дня (${selectedDate})</h2>
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <span style="font-size:12px; color:var(--text-muted);">Дата отчета:</span>
+                    <input type="date" style="width:auto; padding:8px 12px;" value="${selectedDate}" onchange="state.taskSelectedDate=this.value; render();">
+                </div>
+            </div>
+
+            <div class="task-input-group">
+                <div class="task-item-row"><span>1. Физ. нагрузки (мин)</span><input type="number" min="0" id="t1" style="width:90px; text-align:right;" value="${existing ? escapeHtml(existing.physicalExerciseMin) : '0'}"></div>
+                <div class="task-item-row"><span>2. Расслабление (мин)</span><input type="number" min="0" id="t2" style="width:90px; text-align:right;" value="${existing ? escapeHtml(existing.relaxationMin) : '0'}"></div>
+                <div class="task-item-row"><span>3. Книга (название, стр)</span><input type="text" id="t3" style="width:200px;" placeholder="Название и страницы" value="${existing ? escapeHtml(existing.readingBookDetails) : ''}"></div>
+                <div class="task-item-row"><span>4. Хотира (память)</span><input type="checkbox" class="checkbox" id="t4" ${existing && existing.memoryCompleted ? 'checked' : ''}></div>
+                <div class="task-item-row"><span>5. План на день</span><input type="checkbox" class="checkbox" id="t5" ${existing && existing.planCompleted ? 'checked' : ''}></div>
+                <div class="task-item-row"><span>6. Работа над целью</span><input type="checkbox" class="checkbox" id="t6" ${existing && existing.goalCompleted ? 'checked' : ''}></div>
+                <div class="task-item-row"><span>7. Улыбка и позитив</span><input type="checkbox" class="checkbox" id="t7" ${existing && existing.smileCompleted ? 'checked' : ''}></div>
+                <div class="task-item-row"><span>8. Уверенность</span><input type="checkbox" class="checkbox" id="t8" ${existing && existing.confidenceCompleted ? 'checked' : ''}></div>
+                <div class="task-item-row"><span>9. Аффирмации</span><input type="checkbox" class="checkbox" id="t9" ${existing && existing.affirmationCompleted ? 'checked' : ''}></div>
+                <textarea id="t-comm" rows="3" placeholder="Комментарии и выводы дня...">${existing ? escapeHtml(existing.comments) : ''}</textarea>
+                <button class="btn btn-cyan btn-full" id="save-report-btn" style="padding:14px; font-size:15px;" onclick="saveReport()">${existing ? 'СОХРАНИТЬ ИЗМЕНЕНИЯ ОТЧЕТА' : 'ОТПРАВИТЬ ОТЧЕТ'}</button>
+            </div>
+        `;
+    }
+
+    async function saveReport() {
+        const selectedDate = state.taskSelectedDate || getLocalTodayStr();
+        const existing = state.reports.find(r => r.userId === state.currentUser.id && r.date === selectedDate);
+
+        const reportDraft = {
+            id: existing ? existing.id : ('rep_' + Math.random().toString(36).substr(2, 8)),
+            userId: state.currentUser.id,
+            userName: state.currentUser.name,
+            date: selectedDate,
+            physicalExerciseMin: document.getElementById('t1').value.trim() || '0',
+            relaxationMin: document.getElementById('t2').value.trim() || '0',
+            readingBookDetails: document.getElementById('t3').value.trim(),
+            memoryCompleted: document.getElementById('t4').checked,
+            planCompleted: document.getElementById('t5').checked,
+            goalCompleted: document.getElementById('t6').checked,
+            smileCompleted: document.getElementById('t7').checked,
+            confidenceCompleted: document.getElementById('t8').checked,
+            affirmationCompleted: document.getElementById('t9').checked,
+            comments: document.getElementById('t-comm').value.trim()
+        };
+
+        // Вычисляем точное число выполненных задач из 9 перед отправкой в Google Sheets
+        reportDraft.completedCoreTasksCount = computeCompletedTasksCount(reportDraft);
+
+        const btn = document.getElementById('save-report-btn');
+        if (btn) { btn.disabled = true; btn.innerText = 'Сохранение в базу данных...'; }
+
+        const action = existing ? 'update_report' : 'add_report';
+        const res = await postAPI({ action, report: reportDraft });
+
+        if (res.status === 'success') {
+            showToast(`Отчет сохранен (${reportDraft.completedCoreTasksCount} из 9 задач)!`);
+            await syncAllData(true);
+            switchTab('home');
+        } else {
+            if (btn) { btn.disabled = false; btn.innerText = 'ОТПРАВИТЬ ОТЧЕТ'; }
+            showToast(res.message || 'Ошибка при сохранении отчета', true);
+        }
+    }
+
+    // ============================================================================
+    // 5. ЧАТ И ЛИЧНЫЕ СООБЩЕНИЯ (С ВЫБОРОМ ПОЛУЧАТЕЛЯ И СЖАТИЕМ ФОТО)
+    // ============================================================================
+    function renderChat(c) {
+        const otherUsers = state.users.filter(u => u.id !== state.currentUser.id);
+        if (!state.chatRecipientId && otherUsers.length > 0) {
+            state.chatRecipientId = otherUsers[0].id;
+        }
+
+        let filteredMsgs = [];
+        if (state.chatTab === 'ALL_CHAT') {
+            filteredMsgs = state.messages.filter(m => m.messageType === 'CHAT' || m.messageType === 'MENTOR_BROADCAST');
+        } else if (state.chatTab === 'DIRECT_MESSAGES') {
+            filteredMsgs = state.messages.filter(m => {
+                if (m.messageType !== 'DIRECT_MESSAGE') return false;
+                const isMine = m.senderId === state.currentUser.id || m.recipientId === state.currentUser.id || !m.recipientId;
+                if (!isMine) return false;
+                if (!state.chatRecipientId || state.chatRecipientId === 'ALL') return true;
+                return (m.senderId === state.currentUser.id && m.recipientId === state.chatRecipientId) ||
+                       (m.senderId === state.chatRecipientId && m.recipientId === state.currentUser.id);
+            });
+        }
+
+        c.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h2 style="font-size:22px; font-weight:800;">Чат и Сообщения</h2>
+                <button class="btn btn-surface" onclick="syncAllData(true)"><i class="fa-solid fa-rotate"></i></button>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                <div class="filter-bar">
+                    <div class="filter-chip ${state.chatTab === 'ALL_CHAT' ? 'active' : ''}" onclick="setChatTab('ALL_CHAT')">Общий чат</div>
+                    <div class="filter-chip ${state.chatTab === 'DIRECT_MESSAGES' ? 'active' : ''}" onclick="setChatTab('DIRECT_MESSAGES')">Личные сообщения</div>
+                </div>
+
+                ${state.chatTab === 'DIRECT_MESSAGES' ? `
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <span style="font-size:12px; color:var(--text-muted);">Кому:</span>
+                        <select style="width:auto; padding:7px 12px;" onchange="state.chatRecipientId=this.value; render();">
+                            <option value="ALL" ${state.chatRecipientId === 'ALL' ? 'selected' : ''}>Все диалоги</option>
+                            ${otherUsers.map(u => `
+                                <option value="${u.id}" ${state.chatRecipientId === u.id ? 'selected' : ''}>${escapeHtml(u.name)} (${u.role === 'MENTOR' ? 'Наставник' : 'Ученик'})</option>
+                            `).join('')}
+                        </select>
+                    </div>
+                ` : ''}
+            </div>
+
+            <div class="chat-container">
+                <div class="chat-messages" id="chat-box">
+                    ${filteredMsgs.length === 0 ? `<div style="margin:auto; color:var(--text-muted); font-size:13px;">Сообщений пока нет</div>` : ''}
+                    ${filteredMsgs.map(m => {
+                        const isMine = m.senderId === state.currentUser.id;
+                        const isBroadcast = m.messageType === 'MENTOR_BROADCAST';
+                        const isImg = String(m.text || '').startsWith('[B64]');
+                        return `
+                            <div class="chat-bubble ${isBroadcast ? 'chat-broadcast' : (isMine ? 'chat-mine' : 'chat-other')}">
+                                <div class="chat-sender" style="color:${isBroadcast ? 'var(--gold)' : 'var(--cyan)'};">
+                                    ${isBroadcast ? '📢 Объявление • ' : ''}${escapeHtml(m.senderName)}
+                                    ${m.recipientName ? ` → ${escapeHtml(m.recipientName)}` : ''}
+                                </div>
+                                <div>
+                                    ${isImg
+                                        ? `<img src="data:image/jpeg;base64,${m.text.replace('[B64]','')}" style="max-width:100%; max-height:280px; border-radius:12px; margin-top:4px;">`
+                                        : escapeHtml(m.text)}
+                                </div>
+                                <div class="chat-time">${escapeHtml(m.dateFormatted || '')}</div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+                <div class="chat-input-bar">
+                    <input type="file" id="img-input" class="hidden" accept="image/*" onchange="sendImg(event)">
+                    <button class="btn btn-surface" onclick="document.getElementById('img-input').click()" title="Прикрепить фото"><i class="fa-solid fa-image"></i></button>
+                    <input type="text" id="chat-txt" placeholder="Напишите сообщение..." onkeydown="if(event.key==='Enter') sendMsg()">
+                    <button class="btn btn-cyan" onclick="sendMsg()"><i class="fa-solid fa-paper-plane"></i></button>
+                </div>
+            </div>
+        `;
+        setTimeout(() => {
+            const box = document.getElementById('chat-box');
+            if (box) box.scrollTop = box.scrollHeight;
+        }, 60);
+    }
+
+    function setChatTab(tab) { state.chatTab = tab; render(); }
+
+    async function sendMsg() {
+        const input = document.getElementById('chat-txt');
+        const txt = input.value.trim();
+        if (!txt) return;
+        input.value = '';
+
+        const otherUsers = state.users.filter(u => u.id !== state.currentUser.id);
+        const recipientObj = state.chatTab === 'DIRECT_MESSAGES'
+            ? (state.users.find(u => u.id === state.chatRecipientId) || otherUsers[0])
+            : null;
+
+        const msg = {
+            id: 'msg_' + Date.now(),
+            senderId: state.currentUser.id,
+            senderName: state.currentUser.name,
+            senderRole: state.currentUser.role,
+            messageType: state.chatTab === 'DIRECT_MESSAGES' ? 'DIRECT_MESSAGE' : 'CHAT',
+            text: txt,
+            recipientId: recipientObj ? recipientObj.id : '',
+            recipientName: recipientObj ? recipientObj.name : '',
+            dateFormatted: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
+        };
+
+        state.messages.push(msg);
+        render();
+        await postAPI({ action: 'send_message', message: msg });
+        syncAllData(true);
+    }
+
+    // Автоматическое сжатие фото до ~35 КБ для соблюдения лимита ячейки Google Sheets
+    function sendImg(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+            const img = new Image();
+            img.onload = async () => {
+                let w = img.width, h = img.height;
+                const maxDim = 600;
+                if (w > maxDim || h > maxDim) {
+                    if (w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
+                    else { w = Math.round((w * maxDim) / h); h = maxDim; }
+                }
+                const canvas = document.createElement('canvas');
+                canvas.width = w; canvas.height = h;
+                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                const b64 = canvas.toDataURL('image/jpeg', 0.68).split(',')[1];
+
+                const otherUsers = state.users.filter(u => u.id !== state.currentUser.id);
+                const recipientObj = state.chatTab === 'DIRECT_MESSAGES'
+                    ? (state.users.find(u => u.id === state.chatRecipientId) || otherUsers[0])
+                    : null;
+
+                const msg = {
+                    id: 'msg_' + Date.now(),
+                    senderId: state.currentUser.id,
+                    senderName: state.currentUser.name,
+                    senderRole: state.currentUser.role,
+                    messageType: state.chatTab === 'DIRECT_MESSAGES' ? 'DIRECT_MESSAGE' : 'CHAT',
+                    text: '[B64]' + b64,
+                    recipientId: recipientObj ? recipientObj.id : '',
+                    recipientName: recipientObj ? recipientObj.name : '',
+                    dateFormatted: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
+                };
+                state.messages.push(msg);
+                render();
+                await postAPI({ action: 'send_message', message: msg });
+                syncAllData(true);
+            };
+            img.src = evt.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // ============================================================================
+    // 6. РАССЛАБЛЕНИЕ (10 АУДИО-ПРОГРАММ WEB AUDIO API И ДЫХАНИЕ 4-4-4-4)
+    // ============================================================================
+    const AUDIO_PROGRAMS = [
+        { id: 'a1', name: '1. Альфа-волны концентрации (432 Гц)', freq: 432, beat: 10 },
+        { id: 'a2', name: '2. Тета-медитация глубокого покоя (396 Гц)', freq: 396, beat: 6 },
+        { id: 'a3', name: '3. Шум летнего дождя и релакс (256 Гц)', freq: 256, beat: 4 },
+        { id: 'a4', name: '4. Тибетские поющие чаши (528 Гц)', freq: 528, beat: 8 },
+        { id: 'a5', name: '5. Океанский бриз (174 Гц)', freq: 174, beat: 5 },
+        { id: 'a6', name: '6. Частота восстановления сил (639 Гц)', freq: 639, beat: 7.8 }
+    ];
+
+    let _audioCtx = null;
+    let _breathInterval = null;
+
+    function stopRelaxAudio() {
+        if (_audioCtx) {
+            try { _audioCtx.close(); } catch (_) {}
+            _audioCtx = null;
+        }
+        state.activeAudioId = null;
+    }
+
+    function toggleRelaxAudio(progId) {
+        if (state.activeAudioId === progId) {
+            stopRelaxAudio();
+            render();
+            return;
+        }
+        stopRelaxAudio();
+        const prog = AUDIO_PROGRAMS.find(p => p.id === progId);
+        if (!prog) return;
+
+        try {
+            const Ctx = window.AudioContext || window.webkitAudioContext;
+            _audioCtx = new Ctx();
+            const master = _audioCtx.createGain();
+            master.gain.value = 0.14;
+            master.connect(_audioCtx.destination);
+
+            const osc1 = _audioCtx.createOscillator();
+            const osc2 = _audioCtx.createOscillator();
+            osc1.type = 'sine';
+            osc2.type = 'sine';
+            osc1.frequency.value = prog.freq;
+            osc2.frequency.value = prog.freq + prog.beat;
+
+            osc1.connect(master);
+            osc2.connect(master);
+            osc1.start();
+            osc2.start();
+
+            state.activeAudioId = progId;
+            render();
+        } catch (e) {
+            showToast('Не удалось запустить аудио', true);
+        }
+    }
+
+    function renderRelaxation(c) {
+        c.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h2 style="font-size:22px; font-weight:800;">Расслабление и Дыхание</h2>
+                ${state.activeAudioId ? `<button class="btn btn-danger btn-sm" onclick="stopRelaxAudio(); render();">Остановить звук</button>` : ''}
+            </div>
+
+            <div class="grid-2">
+                <div class="card" style="display:flex; flex-direction:column; gap:12px;">
+                    <h3 style="font-size:17px; font-weight:800;"><i class="fa-solid fa-music" style="color:var(--cyan);"></i> Звуковые программы медитации</h3>
+                    <div style="display:flex; flex-direction:column; gap:8px;">
+                        ${AUDIO_PROGRAMS.map(p => {
+                            const active = state.activeAudioId === p.id;
+                            return `
+                                <div onclick="toggleRelaxAudio('${p.id}')" style="display:flex; justify-content:space-between; align-items:center; padding:12px 14px; border-radius:12px; background:var(--surface-dark); border:1px solid ${active ? 'var(--cyan)' : 'var(--border)'}; cursor:pointer;">
+                                    <span style="font-size:13px; font-weight:${active ? '800' : '600'}; color:${active ? 'var(--cyan)' : 'var(--text-white)'};">${p.name}</span>
+                                    <i class="fa-solid ${active ? 'fa-pause' : 'fa-play'}" style="color:var(--cyan);"></i>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+
+                <div class="card" style="text-align:center; display:flex; flex-direction:column; justify-content:space-between; padding:24px;">
+                    <div>
+                        <h3 style="font-size:17px; font-weight:800;"><i class="fa-solid fa-wind" style="color:var(--purple);"></i> Практика дыхания 4-4-4-4</h3>
+                        <p style="color:var(--text-muted); font-size:12px; margin-top:4px;">4 сек вдох • 4 сек задержка • 4 сек выдох • 4 сек пауза</p>
+                    </div>
+
+                    <div class="breath-circle" id="breath-circle-box">
+                        <div id="breath-timer-num" class="tabular-nums" style="font-size:34px; font-weight:800;">4</div>
+                        <div id="breath-phase-txt" style="font-size:13px; color:var(--cyan); font-weight:700; margin-top:4px;">Готовы?</div>
+                    </div>
+
+                    <button class="btn btn-cyan btn-full" onclick="toggleBreathingPractice()" id="breath-btn">Запустить дыхание 4-4-4-4</button>
+                </div>
+            </div>
+        `;
+    }
+
+    function toggleBreathingPractice() {
+        if (_breathInterval) {
+            clearInterval(_breathInterval);
+            _breathInterval = null;
+            const btn = document.getElementById('breath-btn');
+            if (btn) btn.innerText = 'Запустить дыхание 4-4-4-4';
+            return;
+        }
+        const phases = [
+            { name: 'Вдох (4 сек)', scale: 'scale(1.12)', color: 'var(--cyan)' },
+            { name: 'Задержка (4 сек)', scale: 'scale(1.12)', color: 'var(--gold)' },
+            { name: 'Выдох (4 сек)', scale: 'scale(0.88)', color: 'var(--emerald)' },
+            { name: 'Пауза (4 сек)', scale: 'scale(0.88)', color: 'var(--purple)' }
+        ];
+        let phaseIdx = 0;
+        let sec = 4;
+
+        const updateUI = () => {
+            const box = document.getElementById('breath-circle-box');
+            const num = document.getElementById('breath-timer-num');
+            const txt = document.getElementById('breath-phase-txt');
+            const btn = document.getElementById('breath-btn');
+            if (!box || !num || !txt) {
+                clearInterval(_breathInterval);
+                _breathInterval = null;
+                return;
+            }
+            btn.innerText = 'Остановить практику';
+            num.innerText = sec;
+            txt.innerText = phases[phaseIdx].name;
+            box.style.transform = phases[phaseIdx].scale;
+            box.style.borderColor = phases[phaseIdx].color;
+        };
+
+        updateUI();
+        _breathInterval = setInterval(() => {
+            sec--;
+            if (sec < 1) {
+                sec = 4;
+                phaseIdx = (phaseIdx + 1) % 4;
+            }
+            updateUI();
+        }, 1000);
+    }
+
+    // ============================================================================
+    // 7. ИСТОРИЯ ОТЧЕТОВ (УЧЕНИКАМ ДОСТУПНА ТОЛЬКО ИХ ЛИЧНАЯ ИСТОРИЯ)
+    // ============================================================================
+    function renderHistory(c) {
+        const isMentor = state.currentUser.role === 'MENTOR';
+
+        let filtered = state.reports;
+        if (!isMentor) {
+            // Ученик видит строго только свои отчеты
+            filtered = filtered.filter(r => r.userId === state.currentUser.id);
+        } else if (state.historyStudentFilter) {
+            filtered = filtered.filter(r => r.userId === state.historyStudentFilter);
+        }
+
+        const todayStr = getLocalTodayStr();
+        if (state.historyPeriodFilter === 'WEEK') {
+            const d = new Date(); d.setDate(d.getDate() - 6);
+            const cutoff = getLocalTodayStr(d);
+            filtered = filtered.filter(r => r.date >= cutoff);
+        } else if (state.historyPeriodFilter === 'MONTH') {
+            const d = new Date(); d.setDate(d.getDate() - 29);
+            const cutoff = getLocalTodayStr(d);
+            filtered = filtered.filter(r => r.date >= cutoff);
+        } else if (state.historyPeriodFilter === 'ALL') {
+            if (state.startDate && state.endDate) {
+                filtered = filtered.filter(r => r.date >= state.startDate && r.date <= state.endDate);
+            }
+        }
+
+        filtered = [...filtered].sort((a, b) => b.date.localeCompare(a.date));
+
+        let html = `
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h2 style="font-size:22px; font-weight:800;">${isMentor ? 'История отчетов' : 'Моя история отчетов'}</h2>
+                <button class="btn btn-surface" onclick="syncAllData(true)"><i class="fa-solid fa-rotate"></i></button>
+            </div>
+        `;
+
+        if (isMentor) {
+            html += `
+                <div class="filter-bar">
+                    <div class="filter-chip ${state.historyStudentFilter === null ? 'active' : ''}" onclick="setStudentFilter(null)">Все ученики</div>
+                    ${state.users.filter(u => u.role === 'STUDENT').map(u => `
+                        <div class="filter-chip ${state.historyStudentFilter === u.id ? 'active' : ''}" onclick="setStudentFilter('${u.id}')">${escapeHtml(u.name)}</div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        html += `
+            <div class="filter-bar" style="margin-top:4px;">
+                <div class="filter-chip ${state.historyPeriodFilter === 'WEEK' ? 'active' : ''}" onclick="setHistoryPeriod('WEEK')">Неделя</div>
+                <div class="filter-chip ${state.historyPeriodFilter === 'MONTH' ? 'active' : ''}" onclick="setHistoryPeriod('MONTH')">Месяц</div>
+                <div class="filter-chip ${state.historyPeriodFilter === 'ALL' ? 'active' : ''}" onclick="setHistoryPeriod('ALL')">Все (Период)</div>
+            </div>
+        `;
+
+        if (state.historyPeriodFilter === 'ALL') {
+            html += `
+                <div class="card" style="padding:14px;">
+                    <div style="color:var(--text-muted); font-size:12px; margin-bottom:8px;">Выберите период (От — До):</div>
+                    <div class="grid-2">
+                        <div>
+                            <label style="font-size:11px; color:var(--text-muted);">От:</label>
+                            <input type="date" value="${state.startDate}" onchange="setStartDate(this.value)">
+                        </div>
+                        <div>
+                            <label style="font-size:11px; color:var(--text-muted);">До:</label>
+                            <input type="date" value="${state.endDate}" onchange="setEndDate(this.value)">
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        html += `<div style="display:flex; flex-direction:column; gap:12px;">`;
+
+        if (filtered.length === 0) {
+            html += `<div class="card" style="text-align:center; color:var(--text-muted); padding:30px;">Отчетов не найдено<br><span style="font-size:12px;">Попробуйте изменить фильтр или период</span></div>`;
+        } else {
+            filtered.forEach(r => {
+                const cnt = r.completedCoreTasksCount || 0;
+                html += `
+                    <div class="card" style="display:flex; flex-direction:column; gap:10px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <div class="tabular-nums" style="font-weight:800; font-size:16px;">${escapeHtml(r.date)}</div>
+                                <div style="color:var(--cyan); font-size:13px; font-weight:600;">${escapeHtml(r.userName)}</div>
+                            </div>
+                            <span class="role-tag role-student tabular-nums" style="font-size:12px; padding:6px 10px;">
+                                ${cnt} из 9 (${Math.round((cnt / 9) * 100)}%)
+                            </span>
+                        </div>
+                        <div style="font-size:12px; color:var(--text-muted); display:flex; flex-wrap:wrap; gap:12px;">
+                            <span>Физ. нагрузка: <b style="color:var(--text-white);">${escapeHtml(r.physicalExerciseMin)} мин</b></span>
+                            <span>Расслабление: <b style="color:var(--text-white);">${escapeHtml(r.relaxationMin)} мин</b></span>
+                            ${r.readingBookDetails ? `<span>Книга: <b style="color:var(--text-white);">${escapeHtml(r.readingBookDetails)}</b></span>` : ''}
+                        </div>
+                        ${r.comments ? `<div style="color:var(--text-white); font-size:13px; background:var(--surface-dark); padding:10px 12px; border-radius:10px;">💬 ${escapeHtml(r.comments)}</div>` : ''}
+                        <div style="display:flex; justify-content:flex-end; gap:8px;">
+                            <button class="btn btn-surface btn-sm" onclick="inspectReportModal('${r.id}')"><i class="fa-solid fa-eye"></i> Подробнее</button>
+                            ${isMentor ? `<button class="btn btn-surface btn-sm" style="color:var(--danger);" onclick="deleteReport('${r.id}')"><i class="fa-solid fa-trash"></i> Удалить</button>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        html += `</div>`;
+        c.innerHTML = html;
+    }
+
+    function setHistoryPeriod(p) { state.historyPeriodFilter = p; render(); }
+    function setStudentFilter(id) { state.historyStudentFilter = id; render(); }
+    function setStartDate(d) { state.startDate = d; render(); }
+    function setEndDate(d) { state.endDate = d; render(); }
+
+    async function deleteReport(id) {
+        if (!confirm('Удалить этот отчет из базы данных?')) return;
+        state.reports = state.reports.filter(r => r.id !== id);
+        render();
+        const res = await postAPI({ action: 'delete_report', reportId: id });
+        if (res.status === 'success') {
+            showToast('Отчет удален');
+            await syncAllData(true);
+        }
+    }
+
+    // ============================================================================
+    // 8. ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ
+    // ============================================================================
+    function renderProfile(c) {
+        const u = state.currentUser;
+        const isMentor = u.role === 'MENTOR';
+        const myReportsCount = isMentor ? state.reports.length : state.reports.filter(r => r.userId === u.id).length;
+
+        c.innerHTML = `
+            <h2 style="font-size:22px; font-weight:800;">Профиль пользователя</h2>
+            <div class="card" style="display:flex; flex-direction:column; align-items:center; gap:14px; padding:30px; max-width:500px; margin:0 auto; width:100%;">
+                <div class="avatar-circle" style="width:80px; height:80px; font-size:36px;">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+                <h3 style="font-size:20px; font-weight:800;">${escapeHtml(u.name)}</h3>
+                <span class="role-tag ${isMentor ? 'role-mentor' : 'role-student'}" style="font-size:13px; padding:6px 14px;">
+                    ${isMentor ? 'Наставник' : 'Ученик'}
+                </span>
+                <p style="color:var(--text-muted); font-size:14px;">Логин: <b>${escapeHtml(u.login)}</b></p>
+                <p class="tabular-nums" style="color:var(--cyan); font-size:13px; font-weight:700;">
+                    ${isMentor ? `Всего отчетов в базе: ${myReportsCount}` : `Моих отчетов: ${myReportsCount} • Стрик: 🔥 ${u.streakDays || 0} дн.`}
+                </p>
+                <button class="btn btn-danger btn-full" style="margin-top:16px; padding:14px; font-size:15px;" onclick="logout()">ВЫЙТИ ИЗ АККАУНТА</button>
+            </div>
+        `;
+    }
+
+    // ============================================================================
+    // ЗАПУСК ПРИЛОЖЕНИЯ
+    // ============================================================================
+    if (state.currentUser) {
+        render();
+        syncAllData(false);
+    } else {
+        render();
+    }
+</script>
+
+</body>
+</html>
